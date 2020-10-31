@@ -1,0 +1,21 @@
+.wrapper{
+  display: grid;
+  grid-template-columns:  auto  1fr auto auto auto;
+  align-items: center;
+  justify-items: start;
+  padding: 0px 20px;
+
+  border-bottom: 5px solid #19615b;
+
+  i{
+    color:black;
+    font-size:50px;
+  }
+
+}
+
+p{
+  color:black;
+  padding-right: 50px;
+  font-weight: 700;
+}

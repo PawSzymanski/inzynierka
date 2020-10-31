@@ -1,0 +1,35 @@
+.navItem {
+  display: inline-block;
+  list-style: none;
+  border-right: 1px solid #80AAA6;
+  padding:0 30px;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 0;
+  text-decoration: none;
+
+  .navItemLink {
+    text-decoration: none;
+    color: whitesmoke;
+    transition: .1s;
+
+    &:hover{
+      color:#80AAA6;
+      transition: .1s;
+    }
+
+  }
+  .navItemLinkActive {
+    color:#80AAA6;
+    text-decoration: none;
+    border-bottom: 3px groove #80AAA6;
+    padding: 0 0 10px 0;
+
+  }
+}
+
+.navItemSecondary
+{
+  @extend .navItem;
+  border-right: 0px solid #80AAA6;
+}

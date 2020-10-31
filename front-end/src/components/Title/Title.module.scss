@@ -1,0 +1,16 @@
+.title {
+  text-align: center;
+  font-size: 25px;
+  padding: 10px 0px 20px;
+  color:whitesmoke;
+  border-bottom: 2px solid whitesmoke;
+}
+
+.secondaryTitle{
+  @extend .title;
+  margin: 20px 500px;
+  transform: translateX(0);
+  font-size: 40px;
+  text-align: center;
+}
+

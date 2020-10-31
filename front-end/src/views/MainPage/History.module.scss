@@ -1,0 +1,28 @@
+.cardWrapper{
+  display:flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.mainClass {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.medical {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+.info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.date {
+  width: 150px;
+}
+

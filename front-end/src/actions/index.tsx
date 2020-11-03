@@ -17,7 +17,6 @@ export const getAllPatients: ActionCreator<ThunkAction<
     >> = () => {
     return async (dispatch: Dispatch) => {
         const data = await axios.get('/api/patients');
-        console.log(JSON.stringify(data));
         const event: any = {
             type: actionTypes.rootTypes.GET_PATIENTS,
                 payload: data.data._embedded.patients

@@ -13,7 +13,7 @@ export class Receipts extends Component {
     render() {
         return (
             <div className={style.wrapper}>
-                    Pacjeci
+                    Pacjenci
             </div>
         );
     }

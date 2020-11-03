@@ -3,42 +3,91 @@ import markImg from '../../assets/indicator.png'
 import ImageMarker, {Marker, MarkerComponentProps} from 'react-image-marker';
 import {Button, TextField, Tooltip} from "@material-ui/core";
 import styles from './CardForm.module.scss'
+import {TeethView} from "../../enum/TeethView";
+import axios from "axios";
 
-const CustomMarker = (props: MarkerComponentProps) => {
-    return (<>
-                <Tooltip title={aa[(props.itemNumber as number)]} placement="top">
+const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: any , visit: any}> = ({ viewType, description, src, visit}) => {
+    // since we pass a number here, clicks is going to be a number.
+    // setClicks is a function that accepts either a number or a function returning
+    // a number
+    const [markers, setMarkers] = useState<MarkerComponentProps[]>([]);
+    const [markersVanilla, setMarkersVanilla] = useState<any[]>([]);
+
+    const [value, setValue] = useState({});
+
+    const [newMarker, setNewMarker] = useState({x:1 as Number, y:1 as Number});
+
+    const CustomMarker = (props: MarkerComponentProps) => {
+        return (<>
+                <Tooltip title={getTile(props.left, props.top)} placement="top">
                     <div className={styles.img1}>
                         <img src={markImg}/>
                     </div>
                 </Tooltip>
             </>
-    );
-};
+        );
+    };
 
-let a = '';
+    function getTile(x: Number, y: Number): string{
 
-let aa = ['1111111', 'sssssss']
-
-const CardForm:FunctionComponent<{ children: any, description: any, src: any }> = ({ children, description, src}) => {
-    // since we pass a number here, clicks is going to be a number.
-    // setClicks is a function that accepts either a number or a function returning
-    // a number
-    const [markers, setMarkers] = useState<MarkerComponentProps[]>([{
-        top: 20, //10% of the image relative size from top
-        left: 90, //50% of the image relative size from left
-        itemNumber: 0
-    },{
-        top: 40, //10% of the image relative size from top
-        left: 30, //50% of the image relative size from left
-        itemNumber: 1
-    }]);
-
-    const [value, setValue] = useState('');
+        for (let i = 0; i < markersVanilla.length; ++i) {
+            console.log(JSON.stringify(markersVanilla[i].left + '     ' +x ));
+            if(markersVanilla[i].left === x && y === markersVanilla[i].top) {
+                console.log(JSON.stringify(markersVanilla[i].message));
+                return markersVanilla[i].message;
+            }
+        }
+        console.log("nullllllllssss");
+        return '';
+    }
 
     const handleChange = (event : React.ChangeEvent<any>) => {
-        a = event.target.value;
         setValue(event.target.value);
     };
+
+    const getHistory = async() => {
+        let data = await axios.get('api/photoIndicators/search/findAllByVisit_IdAndTeethView' +
+            '?visitId=' + visit.id + '&teethView=' + TeethView[viewType]);
+        let data1 = data.data._embedded.photoIndicators.map((val: any) => ({
+            id: val.id,
+            left: val.x,
+            top: val.y,
+            message: val.message
+        }));
+        console.log(JSON.stringify(data1));
+        setMarkers(data1);
+        setMarkersVanilla(data1);
+    }
+
+    // if (!isLoaded) {
+    //     console.log('CONSTRUCTOR');
+    //     getHistory();
+    //     isLoaded = true;
+    // }
+
+    const addInd = async() => {
+        console.log(JSON.stringify(visit));
+        console.log(JSON.stringify({
+            "teethView": TeethView[viewType] ,
+            "x": newMarker.x,
+            "y": newMarker.y,
+            "message": value,
+            "visit_id": visit.id,
+        }));
+        await axios.post('/api/patient/addIndicatorToVisit',
+            {
+                "teethView": TeethView[viewType],
+                "x": newMarker.x,
+                "y": newMarker.y,
+                "message": value,
+                "visit_id": visit.id,
+            })
+            .then(()=>{
+                getHistory();
+            })
+            .catch((err)=>console.log(err));
+    }
+
         return <>
                 <div className={styles.wrapper}>
                     <div className={styles.card}>
@@ -48,21 +97,24 @@ const CardForm:FunctionComponent<{ children: any, description: any, src: any }> 
                                 src={src}
                                 markers={markers}
                                 onAddMarker={(marker: Marker) => {
-                                    console.log('dod' + JSON.stringify(markers));
                                     setMarkers([{
-                                        top: marker.top, //10% of the image relative size from top
+                                        top: marker.top,
                                         left: marker.left,
                                         itemNumber: 1
                                     }]);
+                                    setNewMarker({
+                                        y: marker.top,
+                                        x: marker.left
+                                    })
                                 }}
                                 markerComponent={CustomMarker}
                             />
                         </div>
                         <div className={styles.info}>
                             <span className={styles.icon}>i</span>
-                            <p>
-                                {children}
-                            </p>
+                            {/*<p>*/}
+                            {/*    {children}*/}
+                            {/*</p>*/}
                         </div>
                     </div>
                     <div className={styles.card2}>
@@ -71,7 +123,7 @@ const CardForm:FunctionComponent<{ children: any, description: any, src: any }> 
                                    value={value}
                                    onChange={handleChange}
                         />
-                        <Button variant="contained" color="primary" >
+                        <Button onClick={addInd} variant="contained" color="primary" >
                             Dodaj
                         </Button>
                     </div>

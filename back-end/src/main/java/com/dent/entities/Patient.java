@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Setter
@@ -36,30 +35,4 @@ public class Patient {
     private String phone;
 
     private Boolean isBlocked;
-
-//    @JsonIgnore
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "kli_na_zni",
-//            joinColumns = { @JoinColumn(name = "kli_klient") },
-//            inverseJoinColumns = { @JoinColumn(name = "zni_znizka") }
-//    )
-//    private List<DiscountEntity> discounts;
-//
-//    @ManyToOne(fetch = FetchType.EAGER)
-//   /* @JoinTable(
-//            name = "kli_na_rol",
-//            joinColumns = { @JoinColumn(name = "kli_klient") },
-//            inverseJoinColumns = { @JoinColumn(name = "rol_role") }
-//    )*/
-//    private RoleEntity role;
-//
-//    @JsonIgnore
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "nag_na_kli",
-//            joinColumns = { @JoinColumn(name = "kli_klient") },
-//            inverseJoinColumns = { @JoinColumn(name = "zni_nagroda") }
-//    )
-//    private List<LoyalitySystemEntity> rewards;
 }

@@ -8,7 +8,7 @@ import axios from "axios";
 
 const CustomMarker = (props: MarkerComponentProps) => {
     return (<>
-                <h1>{getType(props)} {props.top}</h1>
+                <h1>{getType(props)}</h1>
             </>
     );
 };
@@ -22,10 +22,10 @@ let isLoaded = false;
 let history = Array<any>();
 
 function getType(props: MarkerComponentProps) : string {
-    console.log('tyoeeeee' + JSON.stringify(props));
     return history.find(s => props.left == s.left && props.top == s.top)?.type
 }
 
+let isAdded = false;
 const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any }> = ({ children, description, src}) => {
     // since we pass a number here, clicks is going to be a number.
     // setClicks is a function that accepts either a number or a function returning
@@ -37,7 +37,6 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
     const [open, setOpen] = React.useState(false);
 
     const handleChangeMedical = (event : React.ChangeEvent<any>) => {
-        console.log('hange')
         type = event.target.value;
         setAge(event.target.value);
     };
@@ -58,9 +57,6 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
     };
 
     const addMarker = (marker: any) => {
-
-        console.log('mmmmmmmmmmmmmmmmaa' + JSON.stringify(markers));
-        console.log('hhhhhhhhhhhhhhhhaa' + JSON.stringify(history));
     };
 
     const handleAdd = async() => {
@@ -71,7 +67,9 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
                 "y": currentY,
                 "patient_id": patient.id
             })
-            .then(()=>{console.log('jeee')})
+            .then(()=>{
+                isAdded = false;
+            })
             .catch((err)=>console.log(err));
     }
 
@@ -132,24 +130,29 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
                     <div className={styles.image}>
                         <ImageMarker
                             src={src}
-                            markers={markers}
+                            markers={history}
                             onAddMarker={(marker: Marker) => {
                                 console.log('dod' + JSON.stringify(markers));
                                 currentX = (marker.left as number);
                                 currentY = (marker.top as number);
                                 console.log('sssss' + JSON.stringify(currentY));
-                                let tempMarkers = markers;
-                                tempMarkers.push({
-                                    top: marker.top, //10% of the image relative size from top
+
+
+                                if (!isAdded) {
+                                    isAdded = true;
+                                } else {
+                                    history.splice(-1,1)
+                                }
+                                setMarkers([...history, {
+                                    top: marker.top,
                                     left: marker.left,
-                                    itemNumber: 1
-                                });
+                                    type: type
+                                }]);
                                 history.push({
                                     top: marker.top,
                                     left: marker.left,
                                     type: type
                                 })
-
                             }}
                             markerComponent={CustomMarker}
                         />

@@ -107,7 +107,7 @@ const Patients:FunctionComponent<{}> = ({}) => {
     });
 
     return (<>
-        <div> Wszyscy Pacjęci</div>
+        <div> Wszyscy Pacjenci</div>
         <Paper className={classes.root}>
             <TableContainer className={classes.container}>
                 <Table stickyHeader aria-label="sticky table">

@@ -1,4 +1,4 @@
-import React, {FunctionComponent} from 'react';
+import React, {FunctionComponent, useEffect } from 'react';
 import styles from './History.module.scss'
 import CardForm from "../../components/Card/CardForm";
 import teeth from '../../assets/upTeeth.png'
@@ -31,12 +31,10 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-let isLoaded = false;
-
 const History:FunctionComponent<{}> = ({}) => {
     const [visitDate, setVisitDate] = React.useState(null);
     const [visits, setVisits] = React.useState([]);
-    const [selectedVisit, setSelectedVisit] = React.useState({date: null});
+    const [selectedVisit, setSelectedVisit] = React.useState({id: 5, date: null});
 
     const handleChange = (event : React.ChangeEvent<any>)  => {
         setVisits(visits);
@@ -60,14 +58,15 @@ const History:FunctionComponent<{}> = ({}) => {
             id: val.id,
             date: val.date,
         }));
-        console.log(JSON.stringify(data1));
+        setSelectedVisit(data1[0]);
+        console.log('ssss'  + JSON.stringify(data1[0] ));
         setVisits(data1);
+        return data1[0];
     }
 
-    if (!isLoaded) {
+    useEffect(() => {
         getHistory();
-        isLoaded = true;
-    }
+    }, []);
 
     const addVisit = async() => {
         await axios.post('/api/patient/addVisit',
@@ -82,6 +81,7 @@ const History:FunctionComponent<{}> = ({}) => {
     }
         return (
             <>
+
                 <div className={styles.mainClass}>
                     <div className={styles.cardWrapper}>
                         <div style={{

@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useState} from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import markImg from '../../assets/indicator.png'
 import ImageMarker, {Marker, MarkerComponentProps} from 'react-image-marker';
 import {Button, TextField, Tooltip} from "@material-ui/core";
@@ -10,6 +10,7 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
     // since we pass a number here, clicks is going to be a number.
     // setClicks is a function that accepts either a number or a function returning
     // a number
+
     const [markers, setMarkers] = useState<MarkerComponentProps[]>([]);
     const [markersVanilla, setMarkersVanilla] = useState<any[]>([]);
 
@@ -19,6 +20,7 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
 
     const CustomMarker = (props: MarkerComponentProps) => {
         return (<>
+
                 <Tooltip title={getTile(props.left, props.top)} placement="top">
                     <div className={styles.img1}>
                         <img src={markImg}/>
@@ -41,6 +43,7 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
         return '';
     }
 
+
     const handleChange = (event : React.ChangeEvent<any>) => {
         setValue(event.target.value);
     };
@@ -59,11 +62,10 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
         setMarkersVanilla(data1);
     }
 
-    // if (!isLoaded) {
-    //     console.log('CONSTRUCTOR');
-    //     getHistory();
-    //     isLoaded = true;
-    // }
+    useEffect(() => {
+        // Zaktualizuj tytuł dokumentu korzystając z interfejsu API przeglądarki
+        getHistory();
+    },[]);
 
     const addInd = async() => {
         console.log(JSON.stringify(visit));

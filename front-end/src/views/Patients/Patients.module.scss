@@ -1,10 +1,12 @@
 
-.wrapper{
-margin-bottom: 5%;
-
-  .tableWrapper{
-    margin: 1% 10%;
-    max-height: 20vh;
-
-  }
+.root {
+  width: 100%
+}
+.container {
+  max-height: 440px
+}
+.mainPage {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }

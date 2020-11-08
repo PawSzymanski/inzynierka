@@ -1,5 +1,4 @@
-import React, {FunctionComponent} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
+import React, {FunctionComponent, useEffect} from 'react';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -14,6 +13,14 @@ import {withRouter} from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import {getAllPatients} from "../../actions";
 import {rootState} from "../../store";
+import style from "../Patients/Patients.module.scss";
+import withDragDropContext  from 'with-dnd-context'
+import { Calendar, Views, momentLocalizer} from 'react-big-calendar'
+import "react-big-calendar/lib/css/react-big-calendar.css";
+
+import 'react-big-scheduler/lib/css/style.css'
+import moment from 'moment'
+
 
 interface Column {
     id: 'id' | 'name' | 'surname' | 'phone' | 'pesel';
@@ -66,18 +73,18 @@ let rows = [
     createData(1,'', '',  '')
 ];
 
-const useStyles = makeStyles({
-    root: {
-        width: '100%',
-    },
-    container: {
-        maxHeight: 440,
-    },
-});
+
+const localizer = momentLocalizer(moment)
+let events = [
+    {
+        start: '2020-11-11 09:30:00',
+        end: '2020-12-12 23:30:00',
+        title: 'I am finished',
+    }
+];
 
 
 const Patients:FunctionComponent<{}> = ({}) => {
-    const classes = useStyles();
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -105,13 +112,24 @@ const Patients:FunctionComponent<{}> = ({}) => {
             patients: state.rootStore.patients,
         }
     });
+  const callBackFunction = (event: unknown, newPage: number) => {
 
+  // const prevClick = (schedulerData)=> {
+  //     schedulerData.prev();
+  //     schedulerData.setEvents(schedulerData.events);
+  //       setState({
+  //         viewModel: schedulerData
+  //     })
+  // }
+
+
+    };
     return (<>
-            <div>
-                <div style="display: flex">
+            <div className={style.mainPage}>
+                <div >
                     <div> Wszyscy Pacjenci</div>
-                    <Paper className={classes.root}>
-                        <TableContainer className={classes.container}>
+                    <Paper className={style.root}>
+                        <TableContainer className={style.container}>
                             <Table stickyHeader aria-label="sticky table">
                                 <TableHead>
                                     <TableRow>
@@ -159,7 +177,17 @@ const Patients:FunctionComponent<{}> = ({}) => {
                     </Paper>
                 </div>
                 <div>
-
+                    <Calendar
+                        selectable
+                        localizer={localizer}
+                        events={events}
+                        defaultView={Views.WEEK}
+                        scrollToTime={new Date(1970, 1, 1, 6)}
+                        defaultDate={new Date(2020, 9, 1)}
+                        onSelectEvent={event => alert(event.title)}
+                        onSelectSlot={handleChangePage}
+                        style={{ height: 500 }}
+                    />
                 </div>
             </div>
         </>

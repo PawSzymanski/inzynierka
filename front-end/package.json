@@ -15,11 +15,16 @@
     "@types/react-alert": "^5.2.0",
     "@types/react-dom": "^16.9.8",
     "@types/react-redux": "^7.1.9",
+    "@types/react-router-dom": "^5.1.6",
     "all": "0.0.0",
     "axios": "^0.21.0",
     "formik": "^2.2.1",
     "node-sass": "^4.14.1",
-    "react": "^17.0.1",
+    "react": "^16.8.0",
+    "react-big-calendar": "^0.28.5",
+    "react-big-scheduler": "^0.2.5",
+    "react-dnd": "^5.0.0",
+    "react-dnd-html5-backend": "^5.0.1",
     "react-dom": "^17.0.1",
     "react-hot-loader": "^4.12.21",
     "react-image-marker": "^1.2.0",
@@ -32,7 +37,8 @@
     "repair": "^0.1.1",
     "sass-loader": "^8.0.2",
     "typescript": "^4.0.3",
-    "web-vitals": "^0.2.4"
+    "web-vitals": "^0.2.4",
+    "with-dnd-context": "^1.0.4"
   },
   "scripts": {
     "start": "react-scripts start",

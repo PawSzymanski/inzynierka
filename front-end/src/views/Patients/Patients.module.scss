@@ -2,11 +2,20 @@
 .root {
   width: 100%
 }
-.container {
-  max-height: 440px
-}
+
 .mainPage {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  max-height: 440px;
+  padding: 5px;
+}
+
+.textField {
+  width: 200px;
 }

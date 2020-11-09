@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useState} from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import styles from './MedicalTeeth.module.scss'
 import ImageMarker, {Marker, MarkerComponentProps} from 'react-image-marker';
 import {Button, FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
@@ -16,8 +16,6 @@ const CustomMarker = (props: MarkerComponentProps) => {
 let type = '';
 let currentX: number;
 let currentY: number;
-
-let isLoaded = false;
 
 let history = Array<any>();
 
@@ -56,9 +54,6 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
         setOpen(true);
     };
 
-    const addMarker = (marker: any) => {
-    };
-
     const handleAdd = async() => {
         await axios.post('/api/patient/history',
             {
@@ -85,17 +80,9 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
         setMarkers(data1);
     }
 
-    if (!isLoaded) {
+    useEffect(() => {
         getHistory();
-        isLoaded = true;
-    }
-
-    const [value, setValue] = useState('');
-
-    const handleChange = (event : React.ChangeEvent<any>) => {
-        type = event.target.value;
-        setValue(event.target.value);
-    };
+    }, []);
         return <>
             <div className={styles.wrapper}>
                 <div className={styles.input}>

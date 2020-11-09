@@ -15,7 +15,8 @@ public class SpringDataRestConfiguration implements RepositoryRestConfigurer {
                 Patient.class,
                 PhotoHistory.class,
                 Visit.class,
-                PhotoIndicator.class
+                PhotoIndicator.class,
+                Calendar.class
         );
     }
 }

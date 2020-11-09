@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useEffect} from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,17 +9,23 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import * as actionTypes from "../../models/ActionModel";
 import {useDispatch, useSelector} from "react-redux";
-import {withRouter} from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
+import {NavLink, withRouter} from 'react-router-dom';
 import {getAllPatients} from "../../actions";
 import {rootState} from "../../store";
 import style from "../Patients/Patients.module.scss";
-import withDragDropContext  from 'with-dnd-context'
-import { Calendar, Views, momentLocalizer} from 'react-big-calendar'
+import {Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar'
 import "react-big-calendar/lib/css/react-big-calendar.css";
+
+import format from 'date-fns/format'
+import parse from 'date-fns/parse'
+import startOfWeek from 'date-fns/startOfWeek'
+import getDay from 'date-fns/getDay'
 
 import 'react-big-scheduler/lib/css/style.css'
 import moment from 'moment'
+import {Button, Snackbar, TextField} from "@material-ui/core";
+import axios from "axios";
+import {Alert} from "@material-ui/lab";
 
 
 interface Column {
@@ -74,19 +80,59 @@ let rows = [
 ];
 
 
-const localizer = momentLocalizer(moment)
-let events = [
-    {
-        start: '2020-11-11 09:30:00',
-        end: '2020-12-12 23:30:00',
-        title: 'I am finished',
-    }
-];
+const locales = {
+    'pl': require('date-fns/locale/pl'),
+}
+const localizer = dateFnsLocalizer({
+    format,
+    parse,
+    startOfWeek,
+    getDay,
+    locales,
+})
 
 
 const Patients:FunctionComponent<{}> = ({}) => {
+
+    const getCalendars = async() => {
+        let data = await axios.get('/api/calendars');
+        let data1 = data.data.map((val: any) => ({
+            start: new Date(val.from),
+            end: new Date(val.to),
+            title: val.title
+        }));
+        setEvents(data1);
+
+    };
+
+    const addVisit = async() => {
+        await axios.post('/api/calendars',
+            {
+                "from": selectedDateFrom,
+                "to": selectedDateTo,
+                "title": value,
+            })
+            .then(()=>{
+                getCalendars();
+                handleSuccess();
+            })
+            .catch((err)=>{
+                handleWarn();
+                console.log(err);
+            }
+                );
+    }
+
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [value, setValue] = useState('');
+    const [events, setEvents] = useState([]);
+    const [selectedDateFrom, setSelectedDateFrom] = React.useState<Date | null>(
+        new Date(moment().valueOf()),
+    );
+    const [selectedDateTo, setSelectedDateTo] = React.useState<Date | null>(
+        null,
+    );
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -106,24 +152,56 @@ const Patients:FunctionComponent<{}> = ({}) => {
     }
     dispatch(getAllPatients());
 
+    const handleChangeVal = (event : React.ChangeEvent<any>) => {
+       setValue(event.target.value);
+    };
+
+    const handleDateChangeFrom = (date: React.ChangeEvent<any>) => {
+        setSelectedDateFrom(date.target.value);
+    };
+
+    const handleDateChangeTo = (date: React.ChangeEvent<any>) => {
+        setSelectedDateTo(date.target.value);
+    };
+
+    const [openSucc, setOpenSucc] = React.useState(false);
+    const [openWarn, setOpenWarn] = React.useState(false);
+
+    const handleSuccess = () => {
+        setOpenSucc(true);
+    };
+
+    const handleWarn = () => {
+        setOpenWarn(true);
+    };
+
+    const handleCloseSucc = (event?: React.SyntheticEvent, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSucc(false);
+    };
+
+    const handleCloseWarn = (event?: React.SyntheticEvent, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenWarn(false);
+    };
+
     const { rowsTemp } = useSelector<rootState, any>((state: rootState) => {
         rows = state.rootStore.patients;
         return {
             patients: state.rootStore.patients,
         }
     });
-  const callBackFunction = (event: unknown, newPage: number) => {
 
-  // const prevClick = (schedulerData)=> {
-  //     schedulerData.prev();
-  //     schedulerData.setEvents(schedulerData.events);
-  //       setState({
-  //         viewModel: schedulerData
-  //     })
-  // }
+    useEffect(() => {
+       getCalendars();
+    },[]);
 
-
-    };
     return (<>
             <div className={style.mainPage}>
                 <div >
@@ -177,16 +255,64 @@ const Patients:FunctionComponent<{}> = ({}) => {
                     </Paper>
                 </div>
                 <div>
+                    <form className={style.container} noValidate>
+                        <TextField
+                            id="datetime-local"
+                            label="Początek wizyty"
+                            type="datetime-local"
+                            defaultValue={moment().toDate()}
+                            className={style.textField}
+                            value={selectedDateFrom}
+                            onChange={handleDateChangeFrom}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            style={{padding: 5}}
+                        />
+                        <TextField
+                            id="datetime-local2"
+                            label="Koniec wizyty"
+                            type="datetime-local"
+                            value={selectedDateTo}
+                            onChange={handleDateChangeTo}
+                            className={style.textField}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            style={{padding: 5}}
+                        />
+                        <TextField id="standard-basic"
+                                   label="Standard"
+                                   value={value}
+                                   onChange={handleChangeVal}
+                                   style={{padding: 5}}
+                        />
+                        <Button onClick={addVisit} variant="contained" color="primary" >
+                            Dodaj
+                        </Button>
+                        <Snackbar open={openSucc} autoHideDuration={6000} onClose={handleCloseSucc}>
+                            <Alert onClose={handleCloseSucc} severity="success">
+                                Dodano wizytę!
+                            </Alert>
+                        </Snackbar>
+                        <Snackbar open={openWarn} autoHideDuration={6000} onClose={handleCloseWarn}>
+                            <Alert onClose={handleCloseSucc} severity="warning">
+                                Wizyta nakłada się na inną!
+                            </Alert>
+                        </Snackbar>
+                    </form>
+
                     <Calendar
                         selectable
                         localizer={localizer}
                         events={events}
                         defaultView={Views.WEEK}
-                        scrollToTime={new Date(1970, 1, 1, 6)}
-                        defaultDate={new Date(2020, 9, 1)}
+                        min={new Date(0, 0, 0, 7, 0, 0)}
+                        max={new Date(0, 0, 0, 19, 0, 0)}
+                        scrollToTime={new Date(2010, 1, 1, 6)}
+                        defaultDate={moment().toDate()}
                         onSelectEvent={event => alert(event.title)}
                         onSelectSlot={handleChangePage}
-                        style={{ height: 500 }}
                     />
                 </div>
             </div>

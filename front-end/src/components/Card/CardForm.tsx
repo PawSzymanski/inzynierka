@@ -7,14 +7,11 @@ import {TeethView} from "../../enum/TeethView";
 import axios from "axios";
 
 const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: any , visit: any}> = ({ viewType, description, src, visit}) => {
-    // since we pass a number here, clicks is going to be a number.
-    // setClicks is a function that accepts either a number or a function returning
-    // a number
 
     const [markers, setMarkers] = useState<MarkerComponentProps[]>([]);
     const [markersVanilla, setMarkersVanilla] = useState<any[]>([]);
 
-    const [value, setValue] = useState({});
+    const [value, setValue] = useState('');
 
     const [newMarker, setNewMarker] = useState({x:1 as Number, y:1 as Number});
 
@@ -33,13 +30,10 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
     function getTile(x: Number, y: Number): string{
 
         for (let i = 0; i < markersVanilla.length; ++i) {
-            console.log(JSON.stringify(markersVanilla[i].left + '     ' +x ));
-            if(markersVanilla[i].left === x && y === markersVanilla[i].top) {
-                console.log(JSON.stringify(markersVanilla[i].message));
+            if (markersVanilla[i].left === x && y === markersVanilla[i].top) {
                 return markersVanilla[i].message;
             }
         }
-        console.log("nullllllllssss");
         return '';
     }
 
@@ -57,25 +51,15 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
             top: val.y,
             message: val.message
         }));
-        console.log(JSON.stringify(data1));
         setMarkers(data1);
         setMarkersVanilla(data1);
     }
 
     useEffect(() => {
-        // Zaktualizuj tytuł dokumentu korzystając z interfejsu API przeglądarki
         getHistory();
     },[]);
 
     const addInd = async() => {
-        console.log(JSON.stringify(visit));
-        console.log(JSON.stringify({
-            "teethView": TeethView[viewType] ,
-            "x": newMarker.x,
-            "y": newMarker.y,
-            "message": value,
-            "visit_id": visit.id,
-        }));
         await axios.post('/api/patient/addIndicatorToVisit',
             {
                 "teethView": TeethView[viewType],
@@ -114,14 +98,11 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
                         </div>
                         <div className={styles.info}>
                             <span className={styles.icon}>i</span>
-                            {/*<p>*/}
-                            {/*    {children}*/}
-                            {/*</p>*/}
                         </div>
                     </div>
                     <div className={styles.card2}>
                         <TextField id="standard-basic"
-                                   label="Standard"
+                                   label="Notatka"
                                    value={value}
                                    onChange={handleChange}
                         />

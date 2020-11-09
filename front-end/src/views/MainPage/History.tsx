@@ -12,10 +12,8 @@ import {createStyles, makeStyles, Theme} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import axios from "axios";
 import {TeethView} from "../../enum/TeethView";
+import moment from 'moment'
 
-interface Visits {
-    date :any;
-}
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -88,28 +86,24 @@ const History:FunctionComponent<{}> = ({}) => {
                             display: "flex",
                             flexDirection: "row",
                             justifyContent: "center",
-                            padding: "10px"
-                        }}>
-                        <form className={classes.container} noValidate>
-                                <TextField  onChange={setVisitDateEv}
-                                    id="datetime-local"
-                                    label="Data wizyty"
-                                    type="datetime-local"
-                                    defaultValue="2017-05-24T10:30"
-                                    className={classes.textField}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </form>
-                            <Button onClick={addVisit} variant="contained" color="primary" >
-                                Dodaj wizytę
-                            </Button>
+                            padding: "10px" }}>
+                            Data wizyty:
+                            <Select className={styles.date}
+                                    labelId="demo-single-name-label"
+                                    id="demo-single-name"
+                                    value={selectedVisit.date}
+                                    onChange={handleChange}
+                                    input={<Input />}
+                            >
+                                {visits.map((name : any) => (
+                                    <MenuItem  onClick={() => setSelectedVisit(name)} key={name.date} value={name.date}>
+                                        {name.date}
+                                    </MenuItem>
+                                ))}
+                            </Select>
                         </div>
-
-
                         <CardForm src={teeth} description={'Łuk górny'}
-                                  viewType={TeethView.UP} visit={selectedVisit}/>
+                                  viewType={TeethView.UP} visit={selectedVisit} />
                         <CardForm src={teeth} description={'Przód'}
                                   viewType={TeethView.FRONT} visit={selectedVisit}/>
                         <CardForm src={teeth} description={'Łuk dolny'}
@@ -117,21 +111,27 @@ const History:FunctionComponent<{}> = ({}) => {
                     </div>
                     <div className={styles.medical}>
                         <div className={styles.info}>
-                            <div>
-                                Data wizyty:
-                                <Select className={styles.date}
-                                        labelId="demo-single-name-label"
-                                        id="demo-single-name"
-                                        value={selectedVisit.date}
-                                        onChange={handleChange}
-                                        input={<Input />}
-                                >
-                                    {visits.map((name : any) => (
-                                        <MenuItem  onClick={() => setSelectedVisit(name)} key={name.date} value={name.date}>
-                                            {name.date}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
+                            <div style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-around",
+                                padding: "10px"
+                            }}>
+                                <form className={classes.container} noValidate>
+                                    <TextField  onChange={setVisitDateEv}
+                                                id="datetime-local"
+                                                label="Data wizyty"
+                                                type="datetime-local"
+                                                defaultValue="2020-11-24T10:30"
+                                                className={classes.textField}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                    />
+                                </form>
+                                <Button onClick={addVisit} variant="contained" color="primary" >
+                                    Dodaj wizytę
+                                </Button>
                             </div>
                             <div>
                                 <p>Imię: {patient?.name}</p>

@@ -120,7 +120,7 @@ const Patients:FunctionComponent<{}> = ({}) => {
                 handleWarn();
                 console.log(err);
             }
-                );
+         );
     }
 
     const [page, setPage] = React.useState(0);
@@ -204,7 +204,7 @@ const Patients:FunctionComponent<{}> = ({}) => {
 
     return (<>
             <div className={style.mainPage}>
-                <div >
+                <div>
                     <div> Wszyscy Pacjenci</div>
                     <Paper className={style.root}>
                         <TableContainer className={style.container}>
@@ -254,7 +254,7 @@ const Patients:FunctionComponent<{}> = ({}) => {
                         />
                     </Paper>
                 </div>
-                <div>
+                <div className={style.calendar}>
                     <form className={style.container} noValidate>
                         <TextField
                             id="datetime-local"

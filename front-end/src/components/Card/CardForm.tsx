@@ -5,11 +5,11 @@ import {Button, TextField, Tooltip} from "@material-ui/core";
 import styles from './CardForm.module.scss'
 import {TeethView} from "../../enum/TeethView";
 import axios from "axios";
+import {DropzoneArea} from "material-ui-dropzone";
 
-const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: any , visit: any}> = ({ viewType, description, src, visit}) => {
-
-    const [markers, setMarkers] = useState<MarkerComponentProps[]>([]);
-    const [markersVanilla, setMarkersVanilla] = useState<any[]>([]);
+const CardForm:FunctionComponent<{
+    viewType: TeethView, description: any, src: any , markers: any, markersVanilla: any, visit: any, getMarkers1: any, setMarkers1: any, patient: any, setSrc: any}> =
+    ({ viewType, description, src, markers, markersVanilla, visit, getMarkers1, setMarkers1, patient, setSrc}) => {
 
     const [value, setValue] = useState('');
 
@@ -28,7 +28,6 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
     };
 
     function getTile(x: Number, y: Number): string{
-
         for (let i = 0; i < markersVanilla.length; ++i) {
             if (markersVanilla[i].left === x && y === markersVanilla[i].top) {
                 return markersVanilla[i].message;
@@ -37,26 +36,34 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
         return '';
     }
 
-
     const handleChange = (event : React.ChangeEvent<any>) => {
         setValue(event.target.value);
     };
 
-    const getHistory = async() => {
-        let data = await axios.get('api/photoIndicators/search/findAllByVisit_IdAndTeethView' +
-            '?visitId=' + visit.id + '&teethView=' + TeethView[viewType]);
-        let data1 = data.data._embedded.photoIndicators.map((val: any) => ({
-            id: val.id,
-            left: val.x,
-            top: val.y,
-            message: val.message
-        }));
-        setMarkers(data1);
-        setMarkersVanilla(data1);
+    const handleUploadFile = (files: Blob[]) => {
+        console.log('ASSSASAAAAAAAAAAA' + files);
+        if (files[0]) {
+            console.log('ASSSASAAAAAAAAAAA IN' + files);
+            getBase64(files[0], (result) => {
+
+                addFile(result);
+            });
+        }
+
+    };
+
+    const getBase64 = (file: Blob, cb) => {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            cb(reader.result)
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
     }
 
     useEffect(() => {
-        getHistory();
     },[]);
 
     const addInd = async() => {
@@ -69,7 +76,21 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
                 "visit_id": visit.id,
             })
             .then(()=>{
-                getHistory();
+                getMarkers1(visit);
+                setValue("");
+            })
+            .catch((err)=>console.log(err));
+    }
+
+    const addFile = async(base64: any) => {
+        await axios.post('/api/patient/addPhotoToVisit',
+            {
+                "teethView": TeethView[viewType],
+                "visit_id": visit.id,
+                "base64": base64
+            })
+            .then(()=>{
+                setSrc(base64);
             })
             .catch((err)=>console.log(err));
     }
@@ -79,11 +100,12 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
                     <div className={styles.card}>
                         <div className={styles.description}>{description}</div>
                         <div className={styles.image}>
+                            {src ? (
                             <ImageMarker
                                 src={src}
                                 markers={markers}
                                 onAddMarker={(marker: Marker) => {
-                                    setMarkers([{
+                                    setMarkers1([{
                                         top: marker.top,
                                         left: marker.left,
                                         itemNumber: 1
@@ -95,6 +117,12 @@ const CardForm:FunctionComponent<{ viewType: TeethView, description: any, src: a
                                 }}
                                 markerComponent={CustomMarker}
                             />
+                            ) : (
+                                <DropzoneArea
+                                    onChange={handleUploadFile}
+                                    dropzoneText={"Przeciągnij plik tutaj"}
+                                />
+                            )}
                         </div>
                         <div className={styles.info}>
                             <span className={styles.icon}>i</span>

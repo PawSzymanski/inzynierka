@@ -21,4 +21,10 @@ export type setPatientId = {
     payload: payloadModel.rootStore;
 }
 
-export type Action = testMessageAction | isAliveAction | getAllPatients | setPatientId;
+export type setPatientMarkers = {
+    type: typeof actionTypes.rootTypes.SET_PATIENT_MARKERS;
+    payload: payloadModel.rootStore;
+}
+
+export type Action = testMessageAction | isAliveAction | getAllPatients | setPatientId |
+    setPatientMarkers;

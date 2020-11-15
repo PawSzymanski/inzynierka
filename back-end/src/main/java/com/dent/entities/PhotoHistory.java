@@ -1,6 +1,8 @@
 package com.dent.entities;
 
 
+import com.dent.enums.TeethView;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +21,10 @@ public class PhotoHistory {
 
     private String base64;
 
+    @Enumerated(EnumType.STRING)
+    private TeethView teethView;
+
+    @JsonIgnore
     @ManyToOne
     private Visit visit;
 }

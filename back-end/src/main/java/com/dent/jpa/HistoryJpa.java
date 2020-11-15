@@ -10,4 +10,5 @@ import java.util.List;
 public interface HistoryJpa extends CrudRepository<History, Long> {
 
     List<History> findAllByPatient_Id(Long id);
+
 }

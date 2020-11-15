@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useEffect } from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import styles from './History.module.scss'
 import CardForm from "../../components/Card/CardForm";
 import teeth from '../../assets/upTeeth.png'
@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import axios from "axios";
 import {TeethView} from "../../enum/TeethView";
 import moment from 'moment'
+import {MarkerComponentProps} from "react-image-marker";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -32,10 +33,29 @@ const useStyles = makeStyles((theme: Theme) =>
 const History:FunctionComponent<{}> = ({}) => {
     const [visitDate, setVisitDate] = React.useState(null);
     const [visits, setVisits] = React.useState([]);
+    const [srcUp, setSrcUp] = React.useState(null);
+    const [srcF, setSrcF] = React.useState(null);
+    const [srcD, setSrcD] = React.useState(null);
     const [selectedVisit, setSelectedVisit] = React.useState({id: 5, date: null});
 
-    const handleChange = (event : React.ChangeEvent<any>)  => {
-        setVisits(visits);
+    const [upperMarkers, setUpperMarkers] = useState<MarkerComponentProps[]>([]);
+    const [frontMarkers, setFrontMarkers] = useState<MarkerComponentProps[]>([]);
+    const [lowerMarkers, setLowerMarkers] = useState<MarkerComponentProps[]>([]);
+
+    const [upperMarkersVanilla, setUpperMarkersVanilla] = useState<any>([]);
+    const [frontMarkersVanilla, setFrontMarkersVanilla] = useState<any>([]);
+    const [lowerMarkersVanilla, setLowerMarkersVanilla] = useState<any>([]);
+
+    const handleChange = ()  => {
+        getMarkers(TeethView.UP);
+        getMarkers(TeethView.FRONT);
+        getMarkers(TeethView.DOWN);
+    };
+
+    const handleChangeVisit = (event : any)  => {
+        console.log(JSON.stringify(event))
+        setSelectedVisit(event);
+        handleChange();
     };
 
     const setVisitDateEv = (event : React.ChangeEvent<any>)  => {
@@ -50,20 +70,56 @@ const History:FunctionComponent<{}> = ({}) => {
     });
     const classes = useStyles();
 
-    const getHistory = async() => {
-        let data = await axios.get('/api/visits/search/findAllByPatient_Id?patientId=' + patient.id);
-        let data1 = data.data._embedded.visits.map((val: any) => ({
+    const getMarkers = async(type: any) => {
+        console.log('getForVisit' + selectedVisit.id);
+
+        let data = await axios.get('api/photoIndicators/search/findAllByVisit_IdAndTeethView' +
+            '?visitId=' + selectedVisit.id + '&teethView=' + TeethView[type]);
+        let data1 = data.data._embedded.photoIndicators.map((val: any) => ({
             id: val.id,
-            date: val.date,
+            left: val.x,
+            top: val.y,
+            message: val.message
         }));
-        setSelectedVisit(data1[0]);
-        console.log('ssss'  + JSON.stringify(data1[0] ));
-        setVisits(data1);
-        return data1[0];
+
+        let photo = await axios.get('/api/patient/getPhoto' +
+            '?visitId=' + selectedVisit.id + '&teethView=' + TeethView[type]);
+        if (type == TeethView.DOWN) {
+            setLowerMarkers(data1);
+            setLowerMarkersVanilla(data1);
+            setSrcD(photo.data.base64)
+        } else if (type == TeethView.FRONT) {
+            setFrontMarkers(data1);
+            setFrontMarkersVanilla(data1);
+            setSrcF(photo.data.base64)
+        } else if (type == TeethView.UP) {
+            setUpperMarkers(data1);
+            setUpperMarkersVanilla(data1);
+            setSrcUp(photo.data.base64)
+        }
+        return data1;
+    }
+
+    const getHistory = async() => {
+        console.log(patient);
+        if(patient !== undefined) {
+            let data = await axios.get('/api/visits/search/findAllByPatient_Id?patientId=' + patient.id);
+            let data1 = data.data._embedded.visits.map((val: any) => ({
+                id: val.id,
+                  date: val.date,
+            }));
+            setSelectedVisit(data1[0]);
+            console.log('ssss' + JSON.stringify(data1[0]));
+            setVisits(data1);
+            return data1[0];
+        }
     }
 
     useEffect(() => {
         getHistory();
+        setUpperMarkersVanilla(getMarkers(TeethView.UP));
+        setFrontMarkersVanilla(getMarkers(TeethView.FRONT));
+        setLowerMarkersVanilla(getMarkers(TeethView.DOWN));
     }, []);
 
     const addVisit = async() => {
@@ -92,22 +148,33 @@ const History:FunctionComponent<{}> = ({}) => {
                                     labelId="demo-single-name-label"
                                     id="demo-single-name"
                                     value={selectedVisit.date}
-                                    onChange={handleChange}
                                     input={<Input />}
                             >
                                 {visits.map((name : any) => (
-                                    <MenuItem  onClick={() => setSelectedVisit(name)} key={name.date} value={name.date}>
+                                    <MenuItem  onClick={() => handleChangeVisit(name)} key={name.date} value={name.date}>
                                         {name.date}
                                     </MenuItem>
                                 ))}
                             </Select>
                         </div>
-                        <CardForm src={teeth} description={'Łuk górny'}
-                                  viewType={TeethView.UP} visit={selectedVisit} />
-                        <CardForm src={teeth} description={'Przód'}
-                                  viewType={TeethView.FRONT} visit={selectedVisit}/>
-                        <CardForm src={teeth} description={'Łuk dolny'}
-                                  viewType={TeethView.DOWN} visit={selectedVisit}/>
+                        <CardForm src={srcUp} description={'Łuk górny'}
+                                  viewType={TeethView.UP}
+                                  markers={upperMarkers} markersVanilla={upperMarkersVanilla}
+                                  visit={selectedVisit} getMarkers1={handleChangeVisit}
+                                  setMarkers1={setUpperMarkers}
+                                  patient={patient} setSrc={setSrcUp}/>
+                        <CardForm src={srcF} description={'Przód'}
+                                  viewType={TeethView.FRONT}
+                                  markers={frontMarkers} markersVanilla={frontMarkersVanilla}
+                                  visit={selectedVisit} getMarkers1={handleChangeVisit}
+                                  setMarkers1={setFrontMarkers}
+                                  patient={patient} setSrc={setSrcF}/>
+                        <CardForm src={srcD} description={'Łuk dolny'}
+                                  viewType={TeethView.DOWN}
+                                  markers={lowerMarkers} markersVanilla={lowerMarkersVanilla}
+                                  visit={selectedVisit} getMarkers1={handleChangeVisit}
+                                  setMarkers1={setLowerMarkers}
+                                  patient={patient} setSrc={setSrcD}/>
                     </div>
                     <div className={styles.medical}>
                         <div className={styles.info}>

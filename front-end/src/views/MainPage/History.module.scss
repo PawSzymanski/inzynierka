@@ -1,5 +1,6 @@
 .cardWrapper{
   display:flex;
+  flex: 50;
   flex-direction: column;
   justify-content: space-around;
 }
@@ -12,6 +13,7 @@
 
 .medical {
   display: flex;
+  flex: 50;
   flex-direction: column;
   justify-content: start;
 }

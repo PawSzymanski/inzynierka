@@ -69,15 +69,17 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
     }
 
     const getHistory = async() => {
-        let data = await axios.get('/api/histories/search/findAllByPatient_Id?id=' + patient.id);
-        let data1 = data.data._embedded.histories.map((val: any) => ({
-            top: val.y,
-            left: val.x,
-            type: val.type
-        }));
-        history = data1;
+        if(patient !== undefined) {
+            let data = await axios.get('/api/histories/search/findAllByPatient_Id?id=' + patient.id);
+            let data1 = data.data._embedded.histories.map((val: any) => ({
+                top: val.y,
+                left: val.x,
+                type: val.type
+            }));
+            history = data1;
 
-        setMarkers(data1);
+            setMarkers(data1);
+        }
     }
 
     useEffect(() => {
@@ -119,12 +121,8 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
                             src={src}
                             markers={history}
                             onAddMarker={(marker: Marker) => {
-                                console.log('dod' + JSON.stringify(markers));
                                 currentX = (marker.left as number);
                                 currentY = (marker.top as number);
-                                console.log('sssss' + JSON.stringify(currentY));
-
-
                                 if (!isAdded) {
                                     isAdded = true;
                                 } else {

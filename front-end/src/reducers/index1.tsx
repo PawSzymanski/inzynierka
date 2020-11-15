@@ -9,6 +9,13 @@ const initialState: rootState = {
     patients: [],
     isAlive: true,
     currPatientId: null,
+    currVisitId: null,
+    upperMarkers: [],
+    frontMarkers: [],
+    downMarkers: [],
+    upperPhoto: null,
+    frontPhoto: null,
+    downPhoto: null,
 };
 
 export function rootReducer(state: rootState = initialState, action: Action) {
@@ -36,6 +43,14 @@ export function rootReducer(state: rootState = initialState, action: Action) {
             return {
                 ...state,
                 currPatientId: action.payload,
+            }
+        }
+        case actionTypes.rootTypes.SET_PATIENT_MARKERS: {
+            return {
+                ...state,
+                upperMarkers: action.payload.upperMarkers,
+                frontMarkers: action.payload.frontMarkers,
+                downMarkers: action.payload.downMarkers,
             }
         }
         default:

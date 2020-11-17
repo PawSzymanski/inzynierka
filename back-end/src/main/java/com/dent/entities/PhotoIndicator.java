@@ -26,6 +26,8 @@ public class PhotoIndicator {
     @Enumerated(EnumType.STRING)
     private TeethView teethView;
 
+    private String RTGBase64;
+
     @ManyToOne
     private Visit visit;
 }

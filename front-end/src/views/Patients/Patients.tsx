@@ -37,8 +37,9 @@ interface Column {
 }
 
 const columns: Column[] = [
-    { id: 'id', label: 'id', minWidth: 170 },
-    { id: 'name', label: 'Imię', minWidth: 100 },
+    {   id: 'name',
+        label: 'Imię',
+        minWidth: 100 },
     {
         id: 'surname',
         label: 'Nazwisko',
@@ -123,6 +124,25 @@ const Patients:FunctionComponent<{}> = ({}) => {
          );
     }
 
+    const addPatient = async() => {
+        await axios.post('/api/patients',
+            {
+                "name":    (document.getElementById("standard-name") as HTMLInputElement).value,
+                "surname": (document.getElementById("standard-surname") as HTMLInputElement).value,
+                "phone":   (document.getElementById("standard-phone") as HTMLInputElement).value,
+                "pesel":   (document.getElementById("standard-pesel") as HTMLInputElement).value,
+            })
+            .then(()=>{
+                getCalendars();
+                handleSuccessPat();
+            })
+            .catch((err)=>{
+                handleWarn();
+                console.log(err);
+            }
+         );
+    }
+
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [value, setValue] = useState('');
@@ -135,12 +155,11 @@ const Patients:FunctionComponent<{}> = ({}) => {
     );
 
     const handleChangePage = (event: unknown, newPage: number) => {
-        setPage(newPage);
+
     };
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
+
     };
     const dispatch = useDispatch();
 
@@ -165,10 +184,15 @@ const Patients:FunctionComponent<{}> = ({}) => {
     };
 
     const [openSucc, setOpenSucc] = React.useState(false);
+    const [openSuccPat, setOpenSuccPat] = React.useState(false);
     const [openWarn, setOpenWarn] = React.useState(false);
 
     const handleSuccess = () => {
         setOpenSucc(true);
+    };
+
+    const handleSuccessPat = () => {
+        setOpenSuccPat(true);
     };
 
     const handleWarn = () => {
@@ -228,12 +252,13 @@ const Patients:FunctionComponent<{}> = ({}) => {
                                             <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={() => navigate(row.id)}>
                                                     {columns.map((column) => {
                                                     const value = row[column.id];
-                                                    return (
-                                                        <TableCell key={column.id} align={column.align}>
-                                                            <NavLink exact to="/history">
-                                                                {column.format && typeof value === 'number' ? column.format(value) : value}
-                                                            </NavLink>
-                                                        </TableCell>
+                                                    return (<>
+                                                                <TableCell key={column.id} align={column.align}>
+                                                                    <NavLink exact to="/history">
+                                                                        {column.format && typeof value === 'number' ? column.format(value) : value}
+                                                                    </NavLink>
+                                                                </TableCell>
+                                                            </>
                                                     );
                                                 })}
 
@@ -243,6 +268,15 @@ const Patients:FunctionComponent<{}> = ({}) => {
                                 </TableBody>
                             </Table>
                         </TableContainer>
+                        <div style={{padding: "5px"}}>
+                            <TextField id="standard-name" label="Imię" />
+                            <TextField id="standard-surname" label="Nazwisko" />
+                            <TextField id="standard-phone" label="Telefon" />
+                            <TextField id="standard-pesel" label="Pesel" />
+                        </div>
+                        <Button onClick={addPatient} variant="contained" color="primary" >
+                            Dodaj Pacjenta
+                        </Button>
                         <TablePagination
                             rowsPerPageOptions={[10, 25, 100]}
                             component="div"
@@ -293,6 +327,11 @@ const Patients:FunctionComponent<{}> = ({}) => {
                         <Snackbar open={openSucc} autoHideDuration={6000} onClose={handleCloseSucc}>
                             <Alert onClose={handleCloseSucc} severity="success">
                                 Dodano wizytę!
+                            </Alert>
+                        </Snackbar>
+                        <Snackbar open={openSuccPat} autoHideDuration={6000} onClose={handleCloseSucc}>
+                            <Alert onClose={handleCloseSucc} severity="success">
+                                Dodano pacjenta!
                             </Alert>
                         </Snackbar>
                         <Snackbar open={openWarn} autoHideDuration={6000} onClose={handleCloseWarn}>

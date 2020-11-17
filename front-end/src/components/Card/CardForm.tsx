@@ -6,33 +6,53 @@ import styles from './CardForm.module.scss'
 import {TeethView} from "../../enum/TeethView";
 import axios from "axios";
 import {DropzoneArea} from "material-ui-dropzone";
+import ReactTooltip from 'react-tooltip';
 
 const CardForm:FunctionComponent<{
-    viewType: TeethView, description: any, src: any , markers: any, markersVanilla: any, visit: any, getMarkers1: any, setMarkers1: any, patient: any, setSrc: any}> =
-    ({ viewType, description, src, markers, markersVanilla, visit, getMarkers1, setMarkers1, patient, setSrc}) => {
+    viewType: TeethView, description: any, src: any , markers: any,
+    markersVanilla: any, visit: any, getMarkers1: any, setMarkers1: any,
+    patient: any, setSrc: any}> =
+    ({ viewType, description, src, markers, markersVanilla, visit,
+         getMarkers1, setMarkers1, patient, setSrc}) => {
 
     const [value, setValue] = useState('');
+    const [rtg, setRtg] = useState('');
 
     const [newMarker, setNewMarker] = useState({x:1 as Number, y:1 as Number});
 
     const CustomMarker = (props: MarkerComponentProps) => {
         return (<>
-
-                <Tooltip title={getTile(props.left, props.top)} placement="top">
+                <div data-tip='' data-for={'' +props.left.toString() + '' + props.top.toString()}>
                     <div className={styles.img1}>
                         <img src={markImg}/>
                     </div>
-                </Tooltip>
+                </div>
+                <ReactTooltip id={'' + props.left.toString() + '' + props.top.toString()} getContent={() => {
+                    return <><div className={styles.img2}>{getTile(props.left, props.top)}</div></>
+                }}/>
             </>
         );
-    };
+    }
 
-    function getTile(x: Number, y: Number): string{
+
+
+    function getTile(x: Number, y: Number) {
         for (let i = 0; i < markersVanilla.length; ++i) {
+            console.log('NIE' + markersVanilla[i].left + ' ' + markersVanilla[i].top)
             if (markersVanilla[i].left === x && y === markersVanilla[i].top) {
-                return markersVanilla[i].message;
+                console.log('TAK' + markersVanilla[i].left + ' ' + markersVanilla[i].top)
+                return <>
+                            <div>
+                                {markersVanilla[i].message}
+                                <img src={markersVanilla[i].RTGBase64}/>
+                            </div>
+                        </>;
             }
         }
+        return '';
+    }
+
+    function getTooltip(): string{
         return '';
     }
 
@@ -41,12 +61,20 @@ const CardForm:FunctionComponent<{
     };
 
     const handleUploadFile = (files: Blob[]) => {
-        console.log('ASSSASAAAAAAAAAAA' + files);
         if (files[0]) {
-            console.log('ASSSASAAAAAAAAAAA IN' + files);
             getBase64(files[0], (result) => {
 
                 addFile(result);
+            });
+        }
+
+    };
+
+    const handleUploadRTGFile = (files: Blob[]) => {
+        if (files[0]) {
+            console.log('SET');
+            getBase64(files[0], (result) => {
+                setRtg(result);
             });
         }
 
@@ -74,6 +102,7 @@ const CardForm:FunctionComponent<{
                 "y": newMarker.y,
                 "message": value,
                 "visit_id": visit.id,
+                "rtgbase64": rtg,
             })
             .then(()=>{
                 getMarkers1(visit);
@@ -120,7 +149,9 @@ const CardForm:FunctionComponent<{
                             ) : (
                                 <DropzoneArea
                                     onChange={handleUploadFile}
-                                    dropzoneText={"Przeciągnij plik tutaj"}
+                                    dropzoneText={"Przeciągnij zdjęcie tutaj"}
+                                    maxFileSize={10000000}
+                                    filesLimit={1}
                                 />
                             )}
                         </div>
@@ -134,6 +165,12 @@ const CardForm:FunctionComponent<{
                                    value={value}
                                    onChange={handleChange}
                         />
+                        <DropzoneArea
+                            onChange={handleUploadRTGFile}
+                            dropzoneText={"Przeciągnij zdjęcie RTG"}
+                            maxFileSize={10000000}
+                            filesLimit={1}
+                        />
                         <Button onClick={addInd} variant="contained" color="primary" >
                             Dodaj
                         </Button>
@@ -143,7 +180,3 @@ const CardForm:FunctionComponent<{
 }
 
 export default CardForm;
-
-
-
-

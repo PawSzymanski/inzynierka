@@ -10,7 +10,9 @@ import java.util.List;
 @RepositoryRestResource()
 public interface CalendarJpa extends CrudRepository<Calendar, Long> {
 
-    boolean existsByFromIsAfterAndToIsBefore(LocalDateTime from, LocalDateTime to);
+    boolean existsByToIsBeforeAndFromIsAfter(LocalDateTime from, LocalDateTime from2);
+
+    boolean existsByFrom(LocalDateTime from);
 
     List<Calendar> findAll();
 }

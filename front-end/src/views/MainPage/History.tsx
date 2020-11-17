@@ -46,16 +46,16 @@ const History:FunctionComponent<{}> = ({}) => {
     const [frontMarkersVanilla, setFrontMarkersVanilla] = useState<any>([]);
     const [lowerMarkersVanilla, setLowerMarkersVanilla] = useState<any>([]);
 
-    const handleChange = ()  => {
-        getMarkers(TeethView.UP);
-        getMarkers(TeethView.FRONT);
-        getMarkers(TeethView.DOWN);
+    const handleChange = (visit: any)  => {
+        getMarkers(TeethView.UP, visit);
+        getMarkers(TeethView.FRONT, visit);
+        getMarkers(TeethView.DOWN, visit);
     };
 
     const handleChangeVisit = (event : any)  => {
         console.log(JSON.stringify(event))
         setSelectedVisit(event);
-        handleChange();
+        handleChange(event);
     };
 
     const setVisitDateEv = (event : React.ChangeEvent<any>)  => {
@@ -70,20 +70,21 @@ const History:FunctionComponent<{}> = ({}) => {
     });
     const classes = useStyles();
 
-    const getMarkers = async(type: any) => {
-        console.log('getForVisit' + selectedVisit.id);
+    const getMarkers = async(type: any, visit: any) => {
+        console.log('getForVisit' + visit.id);
 
         let data = await axios.get('api/photoIndicators/search/findAllByVisit_IdAndTeethView' +
-            '?visitId=' + selectedVisit.id + '&teethView=' + TeethView[type]);
+            '?visitId=' + visit.id + '&teethView=' + TeethView[type]);
         let data1 = data.data._embedded.photoIndicators.map((val: any) => ({
             id: val.id,
             left: val.x,
             top: val.y,
-            message: val.message
+            message: val.message,
+            RTGBase64: val.rtgbase64
         }));
 
         let photo = await axios.get('/api/patient/getPhoto' +
-            '?visitId=' + selectedVisit.id + '&teethView=' + TeethView[type]);
+            '?visitId=' + visit.id + '&teethView=' + TeethView[type]);
         if (type == TeethView.DOWN) {
             setLowerMarkers(data1);
             setLowerMarkersVanilla(data1);
@@ -109,7 +110,6 @@ const History:FunctionComponent<{}> = ({}) => {
                   date: val.date,
             }));
             setSelectedVisit(data1[0]);
-            console.log('ssss' + JSON.stringify(data1[0]));
             setVisits(data1);
             return data1[0];
         }
@@ -117,9 +117,9 @@ const History:FunctionComponent<{}> = ({}) => {
 
     useEffect(() => {
         getHistory();
-        setUpperMarkersVanilla(getMarkers(TeethView.UP));
-        setFrontMarkersVanilla(getMarkers(TeethView.FRONT));
-        setLowerMarkersVanilla(getMarkers(TeethView.DOWN));
+        setUpperMarkersVanilla(getMarkers(TeethView.UP, selectedVisit));
+        setFrontMarkersVanilla(getMarkers(TeethView.FRONT, selectedVisit));
+        setLowerMarkersVanilla(getMarkers(TeethView.DOWN, selectedVisit));
     }, []);
 
     const addVisit = async() => {

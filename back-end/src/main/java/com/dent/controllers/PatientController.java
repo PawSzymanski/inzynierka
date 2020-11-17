@@ -61,6 +61,7 @@ public class PatientController {
         photoIndicator.setY(model.getY());
         photoIndicator.setVisit(visitJpa.findById(model.getVisit_id()).get());
         photoIndicator.setTeethView(model.getTeethView());
+        photoIndicator.setRTGBase64(model.getRTGBase64());
         photoIndicatorJpa.save(photoIndicator);
         return ResponseEntity.ok(true);
     }

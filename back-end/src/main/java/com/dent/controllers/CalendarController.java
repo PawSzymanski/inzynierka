@@ -24,7 +24,11 @@ public class CalendarController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        if (calendarJpa.existsByFromIsAfterAndToIsBefore(calendar.getFrom(), calendar.getTo())) {
+        if (calendarJpa.existsByToIsBeforeAndFromIsAfter(calendar.getFrom(), calendar.getFrom())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        if (calendarJpa.existsByFrom(calendar.getFrom())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 

@@ -17,4 +17,6 @@ public class IndicatorModel {
     private Long visit_id;
 
     private String message;
+
+    private String RTGBase64;
 }

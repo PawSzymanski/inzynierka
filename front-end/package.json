@@ -34,6 +34,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.0",
     "react-test-renderer": "^16.13.1",
+    "react-tooltip": "^4.2.10",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "repair": "^0.1.1",

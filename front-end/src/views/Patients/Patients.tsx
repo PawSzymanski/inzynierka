@@ -26,13 +26,14 @@ import moment from 'moment'
 import {Button, Snackbar, TextField} from "@material-ui/core";
 import axios from "axios";
 import {Alert} from "@material-ui/lab";
+import styles from "../../components/medicalTeeth/MedicalTeeth.module.scss";
 
 
 interface Column {
     id: 'id' | 'name' | 'surname' | 'phone' | 'pesel';
     label: string;
     minWidth?: number;
-    align?: 'right';
+    align?: 'center';
     format?: (value: number) => string;
 }
 
@@ -43,22 +44,22 @@ const columns: Column[] = [
     {
         id: 'surname',
         label: 'Nazwisko',
-        minWidth: 170,
-        align: 'right',
+        minWidth: 100,
+        align: 'center',
         format: (value: number) => value.toLocaleString('en-US'),
     },
     {
         id: 'phone',
         label: 'Telefon',
-        minWidth: 170,
-        align: 'right',
+        minWidth: 100,
+        align: 'center',
         format: (value: number) => value.toLocaleString('en-US'),
     },
     {
         id: 'pesel',
         label: 'Pesel',
-        minWidth: 170,
-        align: 'right',
+        minWidth: 100,
+        align: 'center',
         format: (value: number) => value.toFixed(2),
     },
 ];
@@ -164,7 +165,6 @@ const Patients:FunctionComponent<{}> = ({}) => {
     const dispatch = useDispatch();
 
     function navigate(id: number) {
-        console.log('1');
         dispatch(({
             type: actionTypes.rootTypes.SET_USER_ID,
             payload: id}));
@@ -228,133 +228,137 @@ const Patients:FunctionComponent<{}> = ({}) => {
 
     return (<>
             <div className={style.mainPage}>
-                <div>
-                    <div> Wszyscy Pacjenci</div>
-                    <Paper className={style.root}>
-                        <TableContainer className={style.container}>
-                            <Table stickyHeader aria-label="sticky table">
-                                <TableHead>
-                                    <TableRow>
-                                        {columns.map((column) => (
-                                            <TableCell
-                                                key={column.id}
-                                                align={column.align}
-                                                style={{ minWidth: column.minWidth }}
-                                            >
-                                                {column.label}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any) => {
-                                        return (
-                                            <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={() => navigate(row.id)}>
-                                                    {columns.map((column) => {
-                                                    const value = row[column.id];
-                                                    return (<>
-                                                                <TableCell key={column.id} align={column.align}>
-                                                                    <NavLink exact to="/history">
-                                                                        {column.format && typeof value === 'number' ? column.format(value) : value}
-                                                                    </NavLink>
-                                                                </TableCell>
-                                                            </>
-                                                    );
-                                                })}
+                <div className={styles.card}>
+                    <div style={{padding: 10}}>
+                        <div> Wszyscy Pacjenci</div>
+                        <Paper >
+                            <TableContainer className={style.container}>
+                                <Table stickyHeader aria-label="sticky table">
+                                    <TableHead>
+                                        <TableRow>
+                                            {columns.map((column) => (
+                                                <TableCell
+                                                    key={column.id}
+                                                    align={column.align}
+                                                    style={{ minWidth: column.minWidth }}
+                                                >
+                                                    {column.label}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any) => {
+                                            return (
+                                                <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={() => navigate(row.id)}>
+                                                        {columns.map((column) => {
+                                                        const value = row[column.id];
+                                                        return (<>
+                                                                    <TableCell key={column.id} align={column.align}>
+                                                                        <NavLink exact to="/history">
+                                                                            {column.format && typeof value === 'number' ? column.format(value) : value}
+                                                                        </NavLink>
+                                                                    </TableCell>
+                                                                </>
+                                                        );
+                                                    })}
 
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <div >
-                            <TextField style={{padding: "5px"}} id="standard-name" label="Imię" />
-                            <TextField style={{padding: "5px"}} id="standard-surname" label="Nazwisko" />
-                            <TextField style={{padding: "5px"}} id="standard-phone" label="Telefon" />
-                            <TextField style={{padding: "5px"}} id="standard-pesel" label="Pesel" />
-                        </div>
-                        <div  style={{display: "flex", justifyContent: "center"}}>
-                            <Button onClick={addPatient} variant="contained" color="primary" >
-                                Dodaj Pacjenta
-                            </Button>
-                        </div>
-                        <TablePagination
-                            rowsPerPageOptions={[10, 25, 100]}
-                            component="div"
-                            count={rows.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onChangePage={handleChangePage}
-                            onChangeRowsPerPage={handleChangeRowsPerPage}
-                        />
-                    </Paper>
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            <div >
+                                <TextField style={{padding: "5px"}} id="standard-name" label="Imię" />
+                                <TextField style={{padding: "5px"}} id="standard-surname" label="Nazwisko" />
+                                <TextField style={{padding: "5px"}} id="standard-phone" label="Telefon" />
+                                <TextField style={{padding: "5px"}} id="standard-pesel" label="Pesel" />
+                            </div>
+                            <div  style={{display: "flex", justifyContent: "center"}}>
+                                <Button onClick={addPatient} variant="contained" color="primary" >
+                                    Dodaj Pacjenta
+                                </Button>
+                            </div>
+                            <TablePagination
+                                rowsPerPageOptions={[10, 25, 100]}
+                                component="div"
+                                count={rows.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onChangePage={handleChangePage}
+                                onChangeRowsPerPage={handleChangeRowsPerPage}
+                            />
+                        </Paper>
+                    </div>
                 </div>
-                <div className={style.calendar}>
-                    <form className={style.container} noValidate>
-                        <TextField
-                            id="datetime-local"
-                            label="Początek wizyty"
-                            type="datetime-local"
-                            defaultValue={moment().toDate()}
-                            className={style.textField}
-                            value={selectedDateFrom}
-                            onChange={handleDateChangeFrom}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            style={{padding: 5}}
-                        />
-                        <TextField
-                            id="datetime-local2"
-                            label="Koniec wizyty"
-                            type="datetime-local"
-                            value={selectedDateTo}
-                            onChange={handleDateChangeTo}
-                            className={style.textField}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            style={{padding: 5}}
-                        />
-                        <TextField id="standard-basic"
-                                   label="Treść wizyty"
-                                   value={value}
-                                   onChange={handleChangeVal}
-                                   style={{padding: 5}}
-                        />
-                        <Button onClick={addVisit} variant="contained" color="primary" >
-                            Dodaj
-                        </Button>
-                        <Snackbar open={openSucc} autoHideDuration={6000} onClose={handleCloseSucc}>
-                            <Alert onClose={handleCloseSucc} severity="success">
-                                Dodano wizytę!
-                            </Alert>
-                        </Snackbar>
-                        <Snackbar open={openSuccPat} autoHideDuration={6000} onClose={handleCloseSucc}>
-                            <Alert onClose={handleCloseSucc} severity="success">
-                                Dodano pacjenta!
-                            </Alert>
-                        </Snackbar>
-                        <Snackbar open={openWarn} autoHideDuration={6000} onClose={handleCloseWarn}>
-                            <Alert onClose={handleCloseSucc} severity="warning">
-                                Wizyta nakłada się na inną!
-                            </Alert>
-                        </Snackbar>
-                    </form>
+                <div className={styles.card}>
+                    <div style={{padding: 10}}>
+                        <form className={style.container} noValidate>
+                            <TextField
+                                id="datetime-local"
+                                label="Początek wizyty"
+                                type="datetime-local"
+                                defaultValue={moment().toDate()}
+                                className={style.textField}
+                                value={selectedDateFrom}
+                                onChange={handleDateChangeFrom}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                style={{padding: 5}}
+                            />
+                            <TextField
+                                id="datetime-local2"
+                                label="Koniec wizyty"
+                                type="datetime-local"
+                                value={selectedDateTo}
+                                onChange={handleDateChangeTo}
+                                className={style.textField}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                style={{padding: 5}}
+                            />
+                            <TextField id="standard-basic"
+                                       label="Treść wizyty"
+                                       value={value}
+                                       onChange={handleChangeVal}
+                                       style={{padding: 5}}
+                            />
+                            <Button onClick={addVisit} variant="contained" color="primary" >
+                                Dodaj
+                            </Button>
+                            <Snackbar open={openSucc} autoHideDuration={6000} onClose={handleCloseSucc}>
+                                <Alert onClose={handleCloseSucc} severity="success">
+                                    Dodano wizytę!
+                                </Alert>
+                            </Snackbar>
+                            <Snackbar open={openSuccPat} autoHideDuration={6000} onClose={handleCloseSucc}>
+                                <Alert onClose={handleCloseSucc} severity="success">
+                                    Dodano pacjenta!
+                                </Alert>
+                            </Snackbar>
+                            <Snackbar open={openWarn} autoHideDuration={6000} onClose={handleCloseWarn}>
+                                <Alert onClose={handleCloseSucc} severity="warning">
+                                    Wizyta nakłada się na inną!
+                                </Alert>
+                            </Snackbar>
+                        </form>
 
-                    <Calendar
-                        selectable
-                        localizer={localizer}
-                        events={events}
-                        defaultView={Views.WEEK}
-                        min={new Date(0, 0, 0, 7, 0, 0)}
-                        max={new Date(0, 0, 0, 19, 0, 0)}
-                        scrollToTime={new Date(2010, 1, 1, 6)}
-                        defaultDate={moment().toDate()}
-                        onSelectEvent={event => alert(event.title)}
-                        onSelectSlot={handleChangePage}
-                    />
+                        <Calendar
+                            selectable
+                            localizer={localizer}
+                            events={events}
+                            defaultView={Views.WEEK}
+                            min={new Date(0, 0, 0, 7, 0, 0)}
+                            max={new Date(0, 0, 0, 19, 0, 0)}
+                            scrollToTime={new Date(2010, 1, 1, 6)}
+                            defaultDate={moment().toDate()}
+                            onSelectEvent={event => alert(event.title)}
+                            onSelectSlot={handleChangePage}
+                        />
+                    </div>
                 </div>
             </div>
         </>

@@ -6,8 +6,7 @@ import {connect} from "react-redux";
 import Header from "../../components/Header/Header";
 import History from "../MainPage/History";
 import Patients from "../Patients/Patients";
-import {Registration} from "../Registration/Registration";
-import {Receipts} from "../Receipts/Receipts";
+import PatientsView from "../PatientsView/PatientsView";
 import Modal from "../../components/Modal/Modal";
 
 
@@ -26,10 +25,8 @@ export class Root extends React.Component {
                     {<Redirect to="/patients"/>}
                     <Route exact path="/history" component={History}/>
                     <Route exact path="/patients" component={Patients}/>
-                    <Route path="/registration" component={Registration}/>
-                    <Route path="/receipts" component={Receipts}/>
-                    {/*<Route path="/userRegistration" component={UserRegistration}  />*/}
-                    {/*<Route path="/userHistory" component={UserHistory}  />*/}
+                    <Route path="/patientsView" component={PatientsView}/>
+                    <Route path="/login" component={PatientsView}  />
                 </Route>
                 {this.props.isModalOpen && <Modal/>}
             </BrowserRouter>

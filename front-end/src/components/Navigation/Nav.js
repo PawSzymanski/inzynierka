@@ -22,7 +22,7 @@ class Nav extends Component {
                     <li className={styles.navItemSecondary}>
                         <NavLink exact
                                  activeClassName={styles.navItemLinkActive}
-                                 className={styles.navItemLink} to="/patients">Strona główna</NavLink>
+                                 className={styles.navItemLink} to="/patients">Strona ggggggłówna</NavLink>
                     </li>
                 </ul>
                 }

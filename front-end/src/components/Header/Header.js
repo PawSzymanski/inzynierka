@@ -3,6 +3,7 @@ import styles from './Header.module.scss';
 import Nav from "../Navigation/Nav";
 import ButtonUI from "../Button/ButtonUI";
 import {connect} from "react-redux";
+import {NavLink} from "react-router-dom";
 // import {useAlert} from "react-alert";
 
 function Header(props) {
@@ -36,6 +37,7 @@ function Header(props) {
                         </>
                         :
                         <>
+                            <NavLink exact to="/patientsView">pacjent</NavLink>
                             <ButtonUI onClick={openModalLog}>Logowanie</ButtonUI>
                             <ButtonUI onClick={openModalReg}>Rejestracja</ButtonUI>
                         </>}

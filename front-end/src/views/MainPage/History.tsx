@@ -5,17 +5,7 @@ import teeth from '../../assets/zeby.png'
 import MedicalTeeth from "../../components/medicalTeeth/MedicalTeeth";
 import Select from "@material-ui/core/Select";
 import Input from "@material-ui/core/Input";
-import {
-    Button,
-    Card,
-    CardContent,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    MenuItem,
-    Modal,
-    Slide
-} from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, MenuItem, Slide} from "@material-ui/core";
 import {useSelector} from "react-redux";
 import {rootState} from "../../store";
 import {createStyles, makeStyles, Theme} from '@material-ui/core/styles';
@@ -23,17 +13,14 @@ import TextField from '@material-ui/core/TextField';
 import axios from "axios";
 import {TeethView} from "../../enum/TeethView";
 import {MarkerComponentProps} from "react-image-marker";
-import { TransitionProps } from '@material-ui/core/transitions';
+import {TransitionProps} from '@material-ui/core/transitions';
 import style from "../Patients/Patients.module.scss";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
-import {NavLink} from "react-router-dom";
 import TableContainer from "@material-ui/core/TableContainer";
-import * as actionTypes from "../../models/ActionModel";
-import Paper from "@material-ui/core/Paper";
 import moment from "moment";
 
 const Transition = React.forwardRef(function Transition(
@@ -62,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 
 interface Column {
-    id: 'nazwa' | 'amount' | 'date';
+    id: 'name' | 'amount' | 'date';
     label: string;
     minWidth?: number;
     align?: 'center';
@@ -70,7 +57,7 @@ interface Column {
 }
 
 const columns: Column[] = [
-    {   id: 'nazwa',
+    {   id: 'name',
         label: 'Nazwa',
         minWidth: 100 },
     {
@@ -103,11 +90,12 @@ function createData(name: string, amount: string, date: string): Data {
 const History:FunctionComponent<{}> = ({}) => {
     const [visitDate, setVisitDate] = React.useState(null);
     const [visits, setVisits] = React.useState([]);
+    const [receipts, setReceipts] = React.useState([]);
     const [srcUp, setSrcUp] = React.useState(null);
     const [srcF, setSrcF] = React.useState(null);
     const [srcD, setSrcD] = React.useState(null);
     const [selectedVisit, setSelectedVisit] = React.useState({id: 5, date: null});
-    const [newReceiptDate, setNewReceiptDate] = React.useState<Date | null>(
+    const [newReceiptDate, setNewReceiptDate] = React.useState<any>(
         new Date(moment().valueOf()),
     )
 
@@ -126,7 +114,6 @@ const History:FunctionComponent<{}> = ({}) => {
     };
 
     const handleChangeVisit = (event : any)  => {
-        console.log(JSON.stringify(event))
         setSelectedVisit(event);
         handleChange(event);
     };
@@ -175,7 +162,6 @@ const History:FunctionComponent<{}> = ({}) => {
     }
 
     const getHistory = async() => {
-        console.log(patient);
         if(patient !== undefined) {
             let data = await axios.get('/api/visits/search/findAllByPatient_Id?patientId=' + patient.id);
             let data1 = data.data._embedded.visits.map((val: any) => ({
@@ -184,6 +170,20 @@ const History:FunctionComponent<{}> = ({}) => {
             }));
             setSelectedVisit(data1[0]);
             setVisits(data1);
+            return data1[0];
+        }
+    }
+
+    const getReceipts = async() => {
+        if(patient !== undefined) {
+            let data = await axios.get('/api/receipts/search/findAllByPatient_Id?patientId=' + patient.id);
+            let data1 = data.data._embedded.receipts.map((val: any) => ({
+                id: val.id,
+                date: val.date,
+                amount: val.amount,
+                name: val.name
+            }));
+            setReceipts(data1);
             return data1[0];
         }
     }
@@ -212,6 +212,7 @@ const History:FunctionComponent<{}> = ({}) => {
 
     const handleClickOpen = () => {
         setIsOpen(true);
+        getReceipts();
     };
 
     const handleClose = () => {
@@ -221,28 +222,21 @@ const History:FunctionComponent<{}> = ({}) => {
     const addReceipt = async() => {
         await axios.post('/api/patient/addReceipt',
             {
-                "name":    (document.getElementById("standard-name") as HTMLInputElement).value,
+                "name": (document.getElementById("standard-name") as HTMLInputElement).value,
                 "amount": (document.getElementById("standard-surname") as HTMLInputElement).value,
-                "phone":   (document.getElementById("standard-phone") as HTMLInputElement).value,
-                "pesel":   (document.getElementById("standard-pesel") as HTMLInputElement).value,
+                "date": newReceiptDate,
+                "patient_id": patient.id,
             })
             .then(()=>{
-
+                getReceipts();
             })
             .catch((err)=>console.log(err))
     };
 
-    const selectedRecDate = () => {
-
+    const handleRecDateChange = (event : React.ChangeEvent<any>) => {
+        setNewReceiptDate(event.target.value);
     };
 
-    const handleRecDateChange = () => {
-
-    };
-
-    let rows = [
-        createData( '',  '', '')
-    ];
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     function navigate(id: number) {
@@ -267,9 +261,17 @@ const History:FunctionComponent<{}> = ({}) => {
                             }}>
 
                             </div>
-                            <div>
+                            <div style={{
+                                display: "flex",
+                                flexDirection: "column" ,
+                                justifyContent: "space-around",
+                                padding: "10px"
+                            }}>
                                 <Button onClick={handleClickOpen} variant="contained" color="primary" >
                                     Historia recept
+                                </Button>
+                                <Button onClick={handleClickOpen} variant="contained" color="primary" >
+                                    Ustaw nowe hasło pacentowi
                                 </Button>
                             </div>
                             <div>
@@ -367,16 +369,14 @@ const History:FunctionComponent<{}> = ({}) => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any) => {
+                                        {receipts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any) => {
                                             return (
-                                                <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={() => navigate(row.id)}>
+                                                <TableRow hover role="checkbox" tabIndex={-1} key={row.id} >
                                                     {columns.map((column) => {
                                                         const value = row[column.id];
                                                         return (<>
                                                                 <TableCell key={column.id} align={column.align}>
-                                                                    <NavLink exact to="/history">
-                                                                        {column.format && typeof value === 'number' ? column.format(value) : value}
-                                                                    </NavLink>
+                                                                    {column.format && typeof value === 'number' ? column.format(value) : value}
                                                                 </TableCell>
                                                             </>
                                                         );
@@ -396,7 +396,7 @@ const History:FunctionComponent<{}> = ({}) => {
                                         id="datetime-local2"
                                         label="Data wystawienia"
                                         type="datetime-local"
-                                        value={selectedRecDate}
+                                        value={newReceiptDate}
                                         onChange={handleRecDateChange}
                                         className={style.textField}
                                         InputLabelProps={{

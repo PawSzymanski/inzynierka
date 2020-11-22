@@ -23,12 +23,10 @@ const CardForm:FunctionComponent<{
     const CustomMarker = (props: MarkerComponentProps) => {
         return (<>
                 <div data-tip='' data-for={'' +props.left.toString() + '' + props.top.toString()}>
-                    <div className={styles.img1}>
-                        <img src={markImg}/>
-                    </div>
+                    <img className={styles.img1} src={markImg}/>
                 </div>
                 <ReactTooltip id={'' + props.left.toString() + '' + props.top.toString()} getContent={() => {
-                    return <><div className={styles.img2}>{getTile(props.left, props.top)}</div></>
+                    return <><div >{getTile(props.left, props.top)}</div></>
                 }}/>
             </>
         );
@@ -41,8 +39,8 @@ const CardForm:FunctionComponent<{
             if (markersVanilla[i].left === x && y === markersVanilla[i].top) {
                 return <>
                             <div>
-                                {markersVanilla[i].message}
-                                <img src={markersVanilla[i].RTGBase64}/>
+                                <div>{markersVanilla[i].message}</div>
+                                <img className={styles.img2} src={markersVanilla[i].RTGBase64}/>
                             </div>
                         </>;
             }
@@ -119,6 +117,7 @@ const CardForm:FunctionComponent<{
 
         return <>
                 <div className={styles.wrapper}>
+                    {patient ? (
                     <div className={styles.card2}>
                         <div style={{padding: 5, display: "flex", flexDirection: "column", justifyContent: "center"}}>
                             <TextField  style={{padding: 5}}
@@ -140,7 +139,8 @@ const CardForm:FunctionComponent<{
                             </Button>
                         </div>
                     </div>
-
+                    ) : ( <div></div> )}
+                    {patient ? (
                     <div className={styles.card}>
                         <div className={styles.description}>{description}</div>
                         <div className={styles.image}>
@@ -174,7 +174,38 @@ const CardForm:FunctionComponent<{
                             <span className={styles.icon}>i</span>
                         </div>
                     </div>
+                    ) : (
+                    <div className={styles.cardPatient}>
+                        <div className={styles.description}>{description}</div>
+                        <div className={styles.image}>
+                            {src ? (
+                                <ImageMarker
+                                    src={src}
+                                    markers={markers}
+                                    onAddMarker={(marker: Marker) => {
+                                        setMarkers1([{
+                                            top: marker.top,
+                                            left: marker.left,
+                                            itemNumber: 1
+                                        }]);
+                                        setNewMarker({
+                                            y: marker.top,
+                                            x: marker.left
+                                        })
+                                    }}
+                                    markerComponent={CustomMarker}
+                                />
+                            ) : (
+                                <div>brak historii z danego dnia</div>
+                            )}
+                        </div>
+                        <div className={styles.info}>
+                            <span className={styles.icon}>i</span>
+                        </div>
+                    </div>
+                    )}
                 </div>
+
             </>
 }
 

@@ -16,7 +16,8 @@ public class SpringDataRestConfiguration implements RepositoryRestConfigurer {
                 PhotoHistory.class,
                 Visit.class,
                 PhotoIndicator.class,
-                Calendar.class
+                Calendar.class,
+                Receipt.class
         );
     }
 }

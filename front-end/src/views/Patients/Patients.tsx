@@ -268,15 +268,17 @@ const Patients:FunctionComponent<{}> = ({}) => {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <div style={{padding: "5px"}}>
-                            <TextField id="standard-name" label="Imię" />
-                            <TextField id="standard-surname" label="Nazwisko" />
-                            <TextField id="standard-phone" label="Telefon" />
-                            <TextField id="standard-pesel" label="Pesel" />
+                        <div >
+                            <TextField style={{padding: "5px"}} id="standard-name" label="Imię" />
+                            <TextField style={{padding: "5px"}} id="standard-surname" label="Nazwisko" />
+                            <TextField style={{padding: "5px"}} id="standard-phone" label="Telefon" />
+                            <TextField style={{padding: "5px"}} id="standard-pesel" label="Pesel" />
                         </div>
-                        <Button onClick={addPatient} variant="contained" color="primary" >
-                            Dodaj Pacjenta
-                        </Button>
+                        <div  style={{display: "flex", justifyContent: "center"}}>
+                            <Button onClick={addPatient} variant="contained" color="primary" >
+                                Dodaj Pacjenta
+                            </Button>
+                        </div>
                         <TablePagination
                             rowsPerPageOptions={[10, 25, 100]}
                             component="div"
@@ -316,7 +318,7 @@ const Patients:FunctionComponent<{}> = ({}) => {
                             style={{padding: 5}}
                         />
                         <TextField id="standard-basic"
-                                   label="Standard"
+                                   label="Treść wizyty"
                                    value={value}
                                    onChange={handleChangeVal}
                                    style={{padding: 5}}

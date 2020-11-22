@@ -1,19 +1,48 @@
 import React, {FunctionComponent, useEffect, useState} from 'react';
 import styles from './History.module.scss'
 import CardForm from "../../components/Card/CardForm";
-import teeth from '../../assets/upTeeth.png'
+import teeth from '../../assets/zeby.png'
 import MedicalTeeth from "../../components/medicalTeeth/MedicalTeeth";
 import Select from "@material-ui/core/Select";
 import Input from "@material-ui/core/Input";
-import {Button, MenuItem} from "@material-ui/core";
-import {useDispatch, useSelector} from "react-redux";
+import {
+    Button,
+    Card,
+    CardContent,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    MenuItem,
+    Modal,
+    Slide
+} from "@material-ui/core";
+import {useSelector} from "react-redux";
 import {rootState} from "../../store";
 import {createStyles, makeStyles, Theme} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import axios from "axios";
 import {TeethView} from "../../enum/TeethView";
-import moment from 'moment'
 import {MarkerComponentProps} from "react-image-marker";
+import { TransitionProps } from '@material-ui/core/transitions';
+import style from "../Patients/Patients.module.scss";
+import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import TableBody from "@material-ui/core/TableBody";
+import {NavLink} from "react-router-dom";
+import TableContainer from "@material-ui/core/TableContainer";
+import * as actionTypes from "../../models/ActionModel";
+import Paper from "@material-ui/core/Paper";
+import moment from "moment";
+
+const Transition = React.forwardRef(function Transition(
+    props: TransitionProps & { children?: React.ReactElement<any, any> },
+    ref: React.Ref<unknown>,
+) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
+
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,6 +59,47 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+
+
+interface Column {
+    id: 'nazwa' | 'amount' | 'date';
+    label: string;
+    minWidth?: number;
+    align?: 'center';
+    format?: (value: number) => string;
+}
+
+const columns: Column[] = [
+    {   id: 'nazwa',
+        label: 'Nazwa',
+        minWidth: 100 },
+    {
+        id: 'amount',
+        label: 'Dawka',
+        minWidth: 150,
+        align: 'center',
+        format: (value: number) => value.toLocaleString('en-US'),
+    },
+    {
+        id: 'date',
+        label: 'Data wypisania',
+        minWidth: 150,
+        align: 'center',
+    }
+];
+
+interface Data {
+    name: string;
+    amount: string;
+    date: string;
+}
+
+function createData(name: string, amount: string, date: string): Data {
+    return { name, amount, date};
+}
+
+
+
 const History:FunctionComponent<{}> = ({}) => {
     const [visitDate, setVisitDate] = React.useState(null);
     const [visits, setVisits] = React.useState([]);
@@ -37,6 +107,9 @@ const History:FunctionComponent<{}> = ({}) => {
     const [srcF, setSrcF] = React.useState(null);
     const [srcD, setSrcD] = React.useState(null);
     const [selectedVisit, setSelectedVisit] = React.useState({id: 5, date: null});
+    const [newReceiptDate, setNewReceiptDate] = React.useState<Date | null>(
+        new Date(moment().valueOf()),
+    )
 
     const [upperMarkers, setUpperMarkers] = useState<MarkerComponentProps[]>([]);
     const [frontMarkers, setFrontMarkers] = useState<MarkerComponentProps[]>([]);
@@ -122,6 +195,7 @@ const History:FunctionComponent<{}> = ({}) => {
         setLowerMarkersVanilla(getMarkers(TeethView.DOWN, selectedVisit));
     }, []);
 
+
     const addVisit = async() => {
         await axios.post('/api/patient/addVisit',
             {
@@ -133,17 +207,98 @@ const History:FunctionComponent<{}> = ({}) => {
             })
             .catch((err)=>console.log(err));
     }
+
+    const [modalIsOpen,setIsOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setIsOpen(true);
+    };
+
+    const handleClose = () => {
+        setIsOpen(false);
+    };
+
+    const addReceipt = async() => {
+        await axios.post('/api/patient/addReceipt',
+            {
+                "name":    (document.getElementById("standard-name") as HTMLInputElement).value,
+                "amount": (document.getElementById("standard-surname") as HTMLInputElement).value,
+                "phone":   (document.getElementById("standard-phone") as HTMLInputElement).value,
+                "pesel":   (document.getElementById("standard-pesel") as HTMLInputElement).value,
+            })
+            .then(()=>{
+
+            })
+            .catch((err)=>console.log(err))
+    };
+
+    const selectedRecDate = () => {
+
+    };
+
+    const handleRecDateChange = () => {
+
+    };
+
+    let rows = [
+        createData( '',  '', '')
+    ];
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    function navigate(id: number) {
+        console.log('navigate');
+    }
         return (
             <>
-
                 <div className={styles.mainClass}>
-                    <div className={styles.cardWrapper}>
-                        <div style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "center",
-                            padding: "10px" }}>
-                            Data wizyty:
+                    <div className={styles.medical}>
+                        <div className={styles.info}>
+
+                            <div>
+                                <p>Imię: {patient?.name}</p>
+                                <p>Nazwisko: {patient?.surname}</p>
+                                <p>Pesel: {patient?.pesel}</p>
+                            </div>
+                            <div style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-around",
+                                padding: "10px"
+                            }}>
+
+                            </div>
+                            <div>
+                                <Button onClick={handleClickOpen} variant="contained" color="primary" >
+                                    Historia recept
+                                </Button>
+                            </div>
+                            <div>
+                                <div style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                                    <form className={classes.container} noValidate>
+                                        <TextField  onChange={setVisitDateEv}
+                                                    id="datetime-local"
+                                                    label="Data nowej wizyty"
+                                                    type="datetime-local"
+                                                    defaultValue="2020-11-24T10:30"
+                                                    className={classes.textField}
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                        />
+                                    </form>
+                                    <Button onClick={addVisit} variant="contained" color="primary" >
+                                        Dodaj nową wizytę
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{padding: "10px"}}>
+                            <MedicalTeeth  src={teeth} description={'Dokumentacja medyczna'} children={''}/>
+                        </div>
+                    </div>
+                    <div className={styles.cardMain}>
+                        <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+                            <div style={{padding: "5px"}}>Data przeglądanej wizyty:</div>
                             <Select className={styles.date}
                                     labelId="demo-single-name-label"
                                     id="demo-single-name"
@@ -157,6 +312,7 @@ const History:FunctionComponent<{}> = ({}) => {
                                 ))}
                             </Select>
                         </div>
+
                         <CardForm src={srcUp} description={'Łuk górny'}
                                   viewType={TeethView.UP}
                                   markers={upperMarkers} markersVanilla={upperMarkersVanilla}
@@ -176,39 +332,92 @@ const History:FunctionComponent<{}> = ({}) => {
                                   setMarkers1={setLowerMarkers}
                                   patient={patient} setSrc={setSrcD}/>
                     </div>
-                    <div className={styles.medical}>
-                        <div className={styles.info}>
-                            <div style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                justifyContent: "space-around",
-                                padding: "10px"
-                            }}>
-                                <form className={classes.container} noValidate>
-                                    <TextField  onChange={setVisitDateEv}
-                                                id="datetime-local"
-                                                label="Data wizyty"
-                                                type="datetime-local"
-                                                defaultValue="2020-11-24T10:30"
-                                                className={classes.textField}
-                                                InputLabelProps={{
-                                                    shrink: true,
-                                                }}
+                </div>
+
+
+                <div>
+                    <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                        Slide in alert dialog
+                    </Button>
+                    <Dialog
+                        open={modalIsOpen}
+                        TransitionComponent={Transition}
+                        keepMounted
+                        onClose={handleClose}
+                        aria-labelledby="alert-dialog-slide-title"
+                        aria-describedby="alert-dialog-slide-description"
+                    >
+                        <DialogContent>
+                            <div>
+                                Recepty
+                            </div>
+                            <TableContainer className={style.container}>
+                                <Table stickyHeader aria-label="sticky table">
+                                    <TableHead>
+                                        <TableRow>
+                                            {columns.map((column) => (
+                                                <TableCell
+                                                    key={column.id}
+                                                    align={column.align}
+                                                    style={{ minWidth: column.minWidth }}
+                                                >
+                                                    {column.label}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any) => {
+                                            return (
+                                                <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={() => navigate(row.id)}>
+                                                    {columns.map((column) => {
+                                                        const value = row[column.id];
+                                                        return (<>
+                                                                <TableCell key={column.id} align={column.align}>
+                                                                    <NavLink exact to="/history">
+                                                                        {column.format && typeof value === 'number' ? column.format(value) : value}
+                                                                    </NavLink>
+                                                                </TableCell>
+                                                            </>
+                                                        );
+                                                    })}
+
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            <div style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                                <div style={{padding: "5px", display: "flex", flexDirection: "row"}}>
+                                    <TextField  style={{padding: "5px"}} id="standard-name" label="Nazwa" />
+                                    <TextField  style={{padding: "5px"}} id="standard-surname" label="Dawka" />
+                                    <TextField
+                                        id="datetime-local2"
+                                        label="Data wystawienia"
+                                        type="datetime-local"
+                                        value={selectedRecDate}
+                                        onChange={handleRecDateChange}
+                                        className={style.textField}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        style={{padding: 5}}
                                     />
-                                </form>
-                                <Button onClick={addVisit} variant="contained" color="primary" >
-                                    Dodaj wizytę
+                                </div>
+                                <Button  onClick={addReceipt} variant="contained" color="primary" >
+                                    Dodaj nowa receptę
                                 </Button>
                             </div>
-                            <div>
-                                <p>Imię: {patient?.name}</p>
-                                <p>Nazwisko: {patient?.surname}</p>
-                                <p>Pesel: {patient?.pesel}</p>
-                            </div>
-                        </div>
-                        <MedicalTeeth src={teeth} description={'Dokumentacja medyczna'} children={''}/>
-                    </div>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose} color="primary">
+                               ok
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </div>
+
             </>
         );
 }

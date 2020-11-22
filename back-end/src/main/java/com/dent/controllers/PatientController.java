@@ -1,15 +1,9 @@
 package com.dent.controllers;
 
-import com.dent.entities.History;
-import com.dent.entities.PhotoHistory;
-import com.dent.entities.PhotoIndicator;
-import com.dent.entities.Visit;
+import com.dent.entities.*;
 import com.dent.enums.TeethView;
 import com.dent.jpa.*;
-import com.dent.models.HistoryBody;
-import com.dent.models.IndicatorModel;
-import com.dent.models.PhotoModel;
-import com.dent.models.VisitModel;
+import com.dent.models.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +21,17 @@ public class PatientController {
 
     private PhotoHistoryJpa photoHistoryJpa;
 
-    public PatientController(HistoryJpa historyJpa, PatientJpa patientJpa, VisitJpa visitJpa,
-                             PhotoIndicatorJpa photoIndicatorJpa, PhotoHistoryJpa photoHistoryJpa) {
+    private ReceiptJpa receiptJpa;
+
+    public PatientController(HistoryJpa historyJpa, PatientJpa patientJpa,
+                             VisitJpa visitJpa, PhotoIndicatorJpa photoIndicatorJpa,
+                             PhotoHistoryJpa photoHistoryJpa, ReceiptJpa receiptJpa) {
         this.historyJpa = historyJpa;
         this.patientJpa = patientJpa;
         this.visitJpa = visitJpa;
         this.photoIndicatorJpa = photoIndicatorJpa;
         this.photoHistoryJpa = photoHistoryJpa;
+        this.receiptJpa = receiptJpa;
     }
 
     @PostMapping("/history")
@@ -73,6 +71,17 @@ public class PatientController {
         ph.setVisit(visitJpa.findById(model.getVisit_id()).get());
         ph.setTeethView(model.getTeethView());
         photoHistoryJpa.save(ph);
+        return ResponseEntity.ok(true);
+    }
+
+    @PostMapping("/addReceipt")
+    public ResponseEntity<Boolean> addReceipt(@RequestBody ReceiptModel model) {
+        Receipt ph = new Receipt();
+        ph.setAmount(model.getAmount());
+        ph.setPatient(patientJpa.findById(model.getPatient_id()).get());
+        ph.setName(model.getName());
+        ph.setDate(model.getDate());
+        receiptJpa.save(ph);
         return ResponseEntity.ok(true);
     }
 

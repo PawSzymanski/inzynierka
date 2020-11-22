@@ -87,35 +87,36 @@ const MedicalTeeth:FunctionComponent<{ children: any, description: any, src: any
     }, []);
         return <>
             <div className={styles.wrapper}>
-                <div className={styles.input}>
-                    <FormControl className={styles.formControl}>
-                        <InputLabel className={styles.inputMed}>Wybierz Rodzaj</InputLabel>
-                        <Select className={styles.inputMed}
-                            labelId="demo-controlled-open-select-label"
-                            id="demo-controlled-open-select"
-                            open={open}
-                            onClose={handleClose}
-                            onOpen={handleOpen}
-                            value={age}
-                            onChange={handleChangeMedical}
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={'o'}>o - zab niewyrzniety</MenuItem>
-                            <MenuItem value={'k'}>k - korona proteza</MenuItem>
-                            <MenuItem value={'~'}>~ - kamień lub osad nazębny</MenuItem>
-                            <MenuItem value={'-'}>- - brak zęba</MenuItem>
-                            <MenuItem value={'c'}>c - próchnica</MenuItem>
-                            <MenuItem value={'w'}>w - wypełnienie</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <Button variant="contained" color="primary" onClick={handleAdd}>
-                        Dodaj
-                    </Button>
-                </div>
+
                 <div className={styles.card}>
                     <div className={styles.description}>{description}</div>
+                    <div className={styles.input}>
+                        <FormControl className={styles.formControl}>
+                            <InputLabel className={styles.inputMed}>Wybierz Rodzaj</InputLabel>
+                            <Select className={styles.inputMed}
+                                    labelId="demo-controlled-open-select-label"
+                                    id="demo-controlled-open-select"
+                                    open={open}
+                                    onClose={handleClose}
+                                    onOpen={handleOpen}
+                                    value={age}
+                                    onChange={handleChangeMedical}
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={'o'}>o - zab niewyrzniety</MenuItem>
+                                <MenuItem value={'k'}>k - korona proteza</MenuItem>
+                                <MenuItem value={'~'}>~ - kamień lub osad nazębny</MenuItem>
+                                <MenuItem value={'-'}>- - brak zęba</MenuItem>
+                                <MenuItem value={'c'}>c - próchnica</MenuItem>
+                                <MenuItem value={'w'}>w - wypełnienie</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <Button variant="contained" color="primary" onClick={handleAdd}>
+                            Dodaj rodzaj leczenia
+                        </Button>
+                    </div>
                     <div className={styles.image}>
                         <ImageMarker
                             src={src}

@@ -38,9 +38,7 @@ const CardForm:FunctionComponent<{
 
     function getTile(x: Number, y: Number) {
         for (let i = 0; i < markersVanilla.length; ++i) {
-            console.log('NIE' + markersVanilla[i].left + ' ' + markersVanilla[i].top)
             if (markersVanilla[i].left === x && y === markersVanilla[i].top) {
-                console.log('TAK' + markersVanilla[i].left + ' ' + markersVanilla[i].top)
                 return <>
                             <div>
                                 {markersVanilla[i].message}
@@ -49,10 +47,6 @@ const CardForm:FunctionComponent<{
                         </>;
             }
         }
-        return '';
-    }
-
-    function getTooltip(): string{
         return '';
     }
 
@@ -72,7 +66,6 @@ const CardForm:FunctionComponent<{
 
     const handleUploadRTGFile = (files: Blob[]) => {
         if (files[0]) {
-            console.log('SET');
             getBase64(files[0], (result) => {
                 setRtg(result);
             });
@@ -126,6 +119,28 @@ const CardForm:FunctionComponent<{
 
         return <>
                 <div className={styles.wrapper}>
+                    <div className={styles.card2}>
+                        <div style={{padding: 5, display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                            <TextField  style={{padding: 5}}
+                                        id="standard-basic"
+                                       label="Notatka"
+                                       value={value}
+                                       onChange={handleChange}
+                            />
+                            <div style={{padding: 5}}>
+                                <DropzoneArea
+                                    onChange={handleUploadRTGFile}
+                                    dropzoneText={"Przeciągnij zdjęcie RTG"}
+                                    maxFileSize={10000000}
+                                    filesLimit={1}
+                                />
+                            </div>
+                            <Button  onClick={addInd} variant="contained" color="primary" >
+                                Dodaj notatkę
+                            </Button>
+                        </div>
+                    </div>
+
                     <div className={styles.card}>
                         <div className={styles.description}>{description}</div>
                         <div className={styles.image}>
@@ -158,22 +173,6 @@ const CardForm:FunctionComponent<{
                         <div className={styles.info}>
                             <span className={styles.icon}>i</span>
                         </div>
-                    </div>
-                    <div className={styles.card2}>
-                        <TextField id="standard-basic"
-                                   label="Notatka"
-                                   value={value}
-                                   onChange={handleChange}
-                        />
-                        <DropzoneArea
-                            onChange={handleUploadRTGFile}
-                            dropzoneText={"Przeciągnij zdjęcie RTG"}
-                            maxFileSize={10000000}
-                            filesLimit={1}
-                        />
-                        <Button onClick={addInd} variant="contained" color="primary" >
-                            Dodaj
-                        </Button>
                     </div>
                 </div>
             </>

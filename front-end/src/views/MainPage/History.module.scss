@@ -1,8 +1,9 @@
 .cardWrapper{
   display:flex;
-  flex: 50;
+  flex: 45;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: stretch;
+  padding: 25px;
 }
 
 .mainClass {
@@ -16,6 +17,7 @@
   flex: 50;
   flex-direction: column;
   justify-content: start;
+  padding: 10px;
 }
 
 .info {
@@ -26,5 +28,22 @@
 
 .date {
   width: 150px;
+}
+
+.cardMain {
+  flex: 55;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px #0f2027;
+  margin: 0 10px;
+}
+
+.card {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px #0f2027;
+  margin: 0 10px;
 }
 

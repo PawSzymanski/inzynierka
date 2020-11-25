@@ -1,20 +1,15 @@
 import React, {FunctionComponent, useEffect, useState} from 'react';
 import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
 import * as actionTypes from "../../models/ActionModel";
 import {useDispatch, useSelector} from "react-redux";
-import {NavLink, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 import {getAllPatients} from "../../actions";
 import {rootState} from "../../store";
 import style from "../Patients/Patients.module.scss";
-import {Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar'
+import {Calendar, dateFnsLocalizer, Views} from 'react-big-calendar'
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import {ColDef, DataGrid} from '@material-ui/data-grid';
+import { useHistory } from "react-router-dom";
 
 import format from 'date-fns/format'
 import parse from 'date-fns/parse'
@@ -28,39 +23,15 @@ import axios from "axios";
 import {Alert} from "@material-ui/lab";
 import styles from "../../components/medicalTeeth/MedicalTeeth.module.scss";
 
-
-interface Column {
-    id: 'id' | 'name' | 'surname' | 'phone' | 'pesel';
-    label: string;
-    minWidth?: number;
-    align?: 'center';
-    format?: (value: number) => string;
-}
-
-const columns: Column[] = [
-    {   id: 'name',
-        label: 'Imię',
-        minWidth: 100 },
+const columns: ColDef[] = [
+    { field: 'name', headerName: 'Imię', width: 180 },
+    { field: 'surname', headerName: 'Nazwisko', width: 180 },
+    { field: 'phone', headerName: 'Telefon', width: 180 },
     {
-        id: 'surname',
-        label: 'Nazwisko',
-        minWidth: 100,
-        align: 'center',
-        format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-        id: 'phone',
-        label: 'Telefon',
-        minWidth: 100,
-        align: 'center',
-        format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-        id: 'pesel',
-        label: 'Pesel',
-        minWidth: 100,
-        align: 'center',
-        format: (value: number) => value.toFixed(2),
+        field: 'pesel',
+        headerName: 'Pesel',
+        type: 'number',
+        width: 200,
     },
 ];
 
@@ -113,6 +84,7 @@ const Patients:FunctionComponent<{}> = ({}) => {
                 "from": selectedDateFrom,
                 "to": selectedDateTo,
                 "title": value,
+                "patientId": selectedRowId
             })
             .then(()=>{
                 getCalendars();
@@ -147,6 +119,7 @@ const Patients:FunctionComponent<{}> = ({}) => {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [value, setValue] = useState('');
+    const [selectedRowId, setSelectedRowId] = useState(0);
     const [events, setEvents] = useState([]);
     const [selectedDateFrom, setSelectedDateFrom] = React.useState<Date | null>(
         new Date(moment().valueOf()),
@@ -159,16 +132,8 @@ const Patients:FunctionComponent<{}> = ({}) => {
 
     };
 
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-
-    };
     const dispatch = useDispatch();
 
-    function navigate(id: number) {
-        dispatch(({
-            type: actionTypes.rootTypes.SET_USER_ID,
-            payload: id}));
-    }
     dispatch(getAllPatients());
 
     const handleChangeVal = (event : React.ChangeEvent<any>) => {
@@ -225,6 +190,25 @@ const Patients:FunctionComponent<{}> = ({}) => {
     useEffect(() => {
        getCalendars();
     },[]);
+    const history = useHistory();
+
+    const onSelectionChanged = ( selectedRowsData : any) => {
+        if (selectedRowsData.rowIds[0]) {
+            console.log(selectedRowsData.rowIds[0]);
+            setSelectedRowId(selectedRowsData.rowIds[0]);
+            dispatch(({
+                type: actionTypes.rootTypes.SET_USER_ID,
+                payload: selectedRowsData.rowIds[0]}));
+        }
+        console.log(JSON.stringify(rows));
+    }
+
+    const nav = () => {
+        if(selectedRowId) {
+            history.push("/history");
+        }
+    }
+
 
     return (<>
             <div className={style.mainPage}>
@@ -232,43 +216,18 @@ const Patients:FunctionComponent<{}> = ({}) => {
                     <div style={{padding: 10}}>
                         <div> Wszyscy Pacjenci</div>
                         <Paper >
-                            <TableContainer className={style.container}>
-                                <Table stickyHeader aria-label="sticky table">
-                                    <TableHead>
-                                        <TableRow>
-                                            {columns.map((column) => (
-                                                <TableCell
-                                                    key={column.id}
-                                                    align={column.align}
-                                                    style={{ minWidth: column.minWidth }}
-                                                >
-                                                    {column.label}
-                                                </TableCell>
-                                            ))}
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any) => {
-                                            return (
-                                                <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={() => navigate(row.id)}>
-                                                        {columns.map((column) => {
-                                                        const value = row[column.id];
-                                                        return (<>
-                                                                    <TableCell key={column.id} align={column.align}>
-                                                                        <NavLink exact to="/history">
-                                                                            {column.format && typeof value === 'number' ? column.format(value) : value}
-                                                                        </NavLink>
-                                                                    </TableCell>
-                                                                </>
-                                                        );
-                                                    })}
+                            <div style={{ height: 400, width: '100%' }}>
+                                <Button onClick={nav} variant="contained" color="primary" >
+                                    Przejdź do historii wybranego pacjenta
+                                </Button>
+                                <DataGrid
+                                    rows={rows}
+                                    columns={columns}
+                                    pageSize={5}
+                                    onSelectionChange={onSelectionChanged}
+                                    checkboxSelection />
+                            </div>
 
-                                                </TableRow>
-                                            );
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
                             <div >
                                 <TextField style={{padding: "5px"}} id="standard-name" label="Imię" />
                                 <TextField style={{padding: "5px"}} id="standard-surname" label="Nazwisko" />
@@ -280,15 +239,6 @@ const Patients:FunctionComponent<{}> = ({}) => {
                                     Dodaj Pacjenta
                                 </Button>
                             </div>
-                            <TablePagination
-                                rowsPerPageOptions={[10, 25, 100]}
-                                component="div"
-                                count={rows.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onChangePage={handleChangePage}
-                                onChangeRowsPerPage={handleChangeRowsPerPage}
-                            />
                         </Paper>
                     </div>
                 </div>

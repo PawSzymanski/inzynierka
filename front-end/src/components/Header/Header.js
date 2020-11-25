@@ -37,9 +37,9 @@ function Header(props) {
                         </>
                         :
                         <>
-                            <NavLink exact to="/patientsView">pacjent</NavLink>
-                            <ButtonUI onClick={openModalLog}>Logowanie</ButtonUI>
-                            <ButtonUI onClick={openModalReg}>Rejestracja</ButtonUI>
+                            <NavLink exact to="/patientsView">panel pacjenta</NavLink>
+                            {/*<ButtonUI onClick={openModalLog}>Logowanie</ButtonUI>*/}
+                            {/*<ButtonUI onClick={openModalReg}>Rejestracja</ButtonUI>*/}
                         </>}
 
                 </header>

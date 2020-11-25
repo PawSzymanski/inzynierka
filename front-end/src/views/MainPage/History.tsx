@@ -94,7 +94,7 @@ const History:FunctionComponent<{}> = ({}) => {
     const [srcUp, setSrcUp] = React.useState(null);
     const [srcF, setSrcF] = React.useState(null);
     const [srcD, setSrcD] = React.useState(null);
-    const [selectedVisit, setSelectedVisit] = React.useState({id: 5, date: null});
+    const [selectedVisit, setSelectedVisit] = React.useState({id: 0, date: null});
     const [newReceiptDate, setNewReceiptDate] = React.useState<any>(
         new Date(moment().valueOf()),
     )
@@ -162,13 +162,15 @@ const History:FunctionComponent<{}> = ({}) => {
     }
 
     const getHistory = async() => {
-        if(patient !== undefined) {
+        if (patient !== undefined) {
             let data = await axios.get('/api/visits/search/findAllByPatient_Id?patientId=' + patient.id);
             let data1 = data.data._embedded.visits.map((val: any) => ({
                 id: val.id,
-                  date: val.date,
+                date: val.date,
             }));
-            setSelectedVisit(data1[0]);
+            if (data1 && data1.length > 0) {
+                handleChangeVisit(data1[0]);
+            }
             setVisits(data1);
             return data1[0];
         }
@@ -239,9 +241,6 @@ const History:FunctionComponent<{}> = ({}) => {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
-    function navigate(id: number) {
-        console.log('navigate');
-    }
         return (
             <>
                 <div className={styles.mainClass}>

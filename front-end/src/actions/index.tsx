@@ -1,7 +1,5 @@
-import * as payloadModel from "../models/StoreModel";
 import * as actionTypes from "../models/ActionModel";
 import axios from "axios";
-import { Action } from "./actionTypes";
 import {ActionCreator, Dispatch} from "redux"
 import {ThunkAction} from "redux-thunk";
 

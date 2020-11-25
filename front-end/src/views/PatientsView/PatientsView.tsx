@@ -102,12 +102,14 @@ const PatientsView:FunctionComponent<{}> = ({}) => {
 
     const getHistory = async() => {
         // if(patient !== undefined) {
-            let data = await axios.get('/api/visits/search/findAllByPatient_Id?patientId=' + 1);
-            let data1 = data.data._embedded.visits.map((val: any) => ({
-                id: val.id,
-                date: val.date,
-            }));
-            setSelectedVisit(data1[0]);
+        let data = await axios.get('/api/visits/search/findAllByPatient_Id?patientId=' + 1);
+        let data1 = data.data._embedded.visits.map((val: any) => ({
+            id: val.id,
+            date: val.date,
+        }));
+            if (data1 && data1.length > 0) {
+                setSelectedVisit(data1[0]);
+            }
             setVisits(data1);
             return data1[0];
         // }

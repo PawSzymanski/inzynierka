@@ -85,6 +85,16 @@ public class PatientController {
         return ResponseEntity.ok(true);
     }
 
+    @PostMapping("/setPassword")
+    public ResponseEntity<Boolean> setPassword(@RequestBody PassModel model) {
+
+//        Patient patient = patientJpa.findById(model.getPatientId()).get();
+//        ph.setPa(model.getName());
+//        ph.setDate(model.getDate());
+//        patientJpa.save(ph);
+        return ResponseEntity.ok(true);
+    }
+
     @GetMapping("/getPhoto")
     public ResponseEntity<PhotoHistory> getPhotoToVisit(@RequestParam Long visitId,
                                                         @RequestParam TeethView teethView) {

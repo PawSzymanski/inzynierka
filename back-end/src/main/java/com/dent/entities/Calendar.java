@@ -24,4 +24,6 @@ public class Calendar {
 
     @Column(name="valueTo")
     private LocalDateTime to;
+
+    private Long patientId;
 }
